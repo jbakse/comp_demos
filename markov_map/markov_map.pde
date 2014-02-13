@@ -14,7 +14,11 @@ boolean ALLOW_HAYSTACK_WILDCARD = false;
 boolean APPLY_RULES_TO_EMPTY_ONLY = true;
 boolean INCLUDE_AUTOS_IN_FINGERPRINT = true;
 
+boolean APPLY_MANUAL_TO_NO_MATCH = false;
+boolean APPLY_NEIGHBOR_TO_NO_MATCH = true;
+
 int NO_MATCH_ID = 0;
+
 
 int foreColor = 1;
 
@@ -85,12 +89,12 @@ void draw()
             {
                 stroke(0, 255, 0);
             }
-            rect(x, y, TILE_SIZE - 1, TILE_SIZE - 1);
+            rect(x, y, TILE_SIZE , TILE_SIZE );
         }
     }
     if (!mousePressed)
     {
-        //stepMap();
+        stepMap();
     }
 }
 
@@ -169,11 +173,13 @@ void stepMap()
 
 
     //calculate rules
+    ArrayList<Integer> manualIDs = new ArrayList<Integer>();
     HashMap<Integer, ArrayList<Integer>> fingerPrintsIDs = new HashMap<Integer, ArrayList<Integer>>();
     for (int row = 0; row < TILE_ROWS; row++)
     {
         for (int col = 0; col < TILE_COLUMNS; col++)
         {
+        	if (tiles[col][row].manual) manualIDs.add(tiles[col][row].id);
             if (tiles[col][row].manual == false && GENERATE_RULES_FOR_MANUAL_ONLY) continue; // interesting
             int f = getFingerprint(tiles, col, row);
             if (f == 0 && !GENERATE_RULES_FOR_ORPHANS) continue; // interesting
@@ -233,6 +239,15 @@ void stepMap()
             if (tiles[col][row].manual == true) continue;
             if (tiles[col][row].id > 0 && APPLY_RULES_TO_EMPTY_ONLY) continue;
 
+          	if (f != 0 && calculatedID == NO_MATCH_ID && APPLY_MANUAL_TO_NO_MATCH && manualIDs.size() > 0) {
+          		calculatedID = manualIDs.get((int)random(0, manualIDs.size()));
+          	}
+          	if (f != 0 && calculatedID == NO_MATCH_ID && APPLY_NEIGHBOR_TO_NO_MATCH) {
+          		ArrayList<Integer> neighborIDs = getNeighborIDs(tilesBackbuffer, col, row);
+          		if (neighborIDs.size() > 0) {
+          			calculatedID = neighborIDs.get((int)random(0, neighborIDs.size()));
+          		}
+          	}
             tiles[col][row].id = calculatedID;
 
         }
@@ -282,6 +297,23 @@ boolean closeEnough(int needle, int haystack)
     }
     return true;
 }
+
+
+ArrayList<Integer> getNeighborIDs(Tile[][] t, int col, int row) {
+	ArrayList<Integer> ids = new ArrayList<Integer>();
+	if (col <= 0 || col >= TILE_COLUMNS - 1) return ids;
+    if (row <= 0 || row >= TILE_ROWS - 1) return ids;
+	if (t[col + 0][row - 1].id > 0) ids.add(t[col + 0][row - 1].id);
+	if (t[col + 1][row - 1].id > 0) ids.add(t[col + 1][row - 1].id);
+	if (t[col + 1][row + 0].id > 0) ids.add(t[col + 1][row + 0].id);
+	if (t[col + 1][row + 1].id > 0) ids.add(t[col + 1][row + 1].id);
+	if (t[col + 0][row + 1].id > 0) ids.add(t[col + 0][row + 1].id);
+	if (t[col - 1][row + 1].id > 0) ids.add(t[col - 1][row + 1].id);
+	if (t[col - 1][row + 0].id > 0) ids.add(t[col - 1][row + 0].id);
+	if (t[col - 1][row - 1].id > 0) ids.add(t[col - 1][row - 1].id);
+	return ids;
+}
+
 
 int getFingerprint(Tile[][] t, int col, int row)
 {
