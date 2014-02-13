@@ -1,6 +1,6 @@
 import java.util.LinkedList;
 
-int TILE_SIZE = 16;
+int TILE_SIZE = 8;
 int SCREEN_WIDTH = 1024;
 int SCREEN_HEIGHT = 768;
 int TILE_COLUMNS = SCREEN_WIDTH / TILE_SIZE;
@@ -8,11 +8,12 @@ int TILE_ROWS = SCREEN_HEIGHT / TILE_SIZE;
 
 boolean GENERATE_RULES_FOR_MANUAL_ONLY = true;
 boolean GENERATE_RULES_FOR_ORPHANS = false;
+boolean INCLUDE_AUTOS_IN_FINGERPRINT = true;
+
 boolean APPLY_RULES_TO_ORPHANS = false;
+boolean APPLY_RULES_TO_EMPTY_ONLY = true;
 boolean ALLOW_NEEDLE_WILDCARD = true;
 boolean ALLOW_HAYSTACK_WILDCARD = false;
-boolean APPLY_RULES_TO_EMPTY_ONLY = true;
-boolean INCLUDE_AUTOS_IN_FINGERPRINT = true;
 
 boolean APPLY_MANUAL_TO_NO_MATCH = false;
 boolean APPLY_NEIGHBOR_TO_NO_MATCH = true;
@@ -84,12 +85,17 @@ void draw()
 
             }
 
-            noStroke();
+
             if (tiles[col][row].manual)
             {
-                stroke(0, 255, 0);
+                stroke(0, 0, 0);
+                rect(x, y, TILE_SIZE - 1, TILE_SIZE - 1);
             }
-            rect(x, y, TILE_SIZE , TILE_SIZE );
+            else
+            {
+                noStroke();
+                rect(x, y, TILE_SIZE , TILE_SIZE );
+            }
         }
     }
     if (!mousePressed)
@@ -179,7 +185,7 @@ void stepMap()
     {
         for (int col = 0; col < TILE_COLUMNS; col++)
         {
-        	if (tiles[col][row].manual) manualIDs.add(tiles[col][row].id);
+            if (tiles[col][row].manual) manualIDs.add(tiles[col][row].id);
             if (tiles[col][row].manual == false && GENERATE_RULES_FOR_MANUAL_ONLY) continue; // interesting
             int f = getFingerprint(tiles, col, row);
             if (f == 0 && !GENERATE_RULES_FOR_ORPHANS) continue; // interesting
@@ -239,15 +245,18 @@ void stepMap()
             if (tiles[col][row].manual == true) continue;
             if (tiles[col][row].id > 0 && APPLY_RULES_TO_EMPTY_ONLY) continue;
 
-          	if (f != 0 && calculatedID == NO_MATCH_ID && APPLY_MANUAL_TO_NO_MATCH && manualIDs.size() > 0) {
-          		calculatedID = manualIDs.get((int)random(0, manualIDs.size()));
-          	}
-          	if (f != 0 && calculatedID == NO_MATCH_ID && APPLY_NEIGHBOR_TO_NO_MATCH) {
-          		ArrayList<Integer> neighborIDs = getNeighborIDs(tilesBackbuffer, col, row);
-          		if (neighborIDs.size() > 0) {
-          			calculatedID = neighborIDs.get((int)random(0, neighborIDs.size()));
-          		}
-          	}
+            if (f != 0 && calculatedID == NO_MATCH_ID && APPLY_MANUAL_TO_NO_MATCH && manualIDs.size() > 0)
+            {
+                calculatedID = manualIDs.get((int)random(0, manualIDs.size()));
+            }
+            if (f != 0 && calculatedID == NO_MATCH_ID && APPLY_NEIGHBOR_TO_NO_MATCH)
+            {
+                ArrayList<Integer> neighborIDs = getNeighborIDs(tilesBackbuffer, col, row);
+                if (neighborIDs.size() > 0)
+                {
+                    calculatedID = neighborIDs.get((int)random(0, neighborIDs.size()));
+                }
+            }
             tiles[col][row].id = calculatedID;
 
         }
@@ -299,19 +308,20 @@ boolean closeEnough(int needle, int haystack)
 }
 
 
-ArrayList<Integer> getNeighborIDs(Tile[][] t, int col, int row) {
-	ArrayList<Integer> ids = new ArrayList<Integer>();
-	if (col <= 0 || col >= TILE_COLUMNS - 1) return ids;
+ArrayList<Integer> getNeighborIDs(Tile[][] t, int col, int row)
+{
+    ArrayList<Integer> ids = new ArrayList<Integer>();
+    if (col <= 0 || col >= TILE_COLUMNS - 1) return ids;
     if (row <= 0 || row >= TILE_ROWS - 1) return ids;
-	if (t[col + 0][row - 1].id > 0) ids.add(t[col + 0][row - 1].id);
-	if (t[col + 1][row - 1].id > 0) ids.add(t[col + 1][row - 1].id);
-	if (t[col + 1][row + 0].id > 0) ids.add(t[col + 1][row + 0].id);
-	if (t[col + 1][row + 1].id > 0) ids.add(t[col + 1][row + 1].id);
-	if (t[col + 0][row + 1].id > 0) ids.add(t[col + 0][row + 1].id);
-	if (t[col - 1][row + 1].id > 0) ids.add(t[col - 1][row + 1].id);
-	if (t[col - 1][row + 0].id > 0) ids.add(t[col - 1][row + 0].id);
-	if (t[col - 1][row - 1].id > 0) ids.add(t[col - 1][row - 1].id);
-	return ids;
+    if (t[col + 0][row - 1].id > 0) ids.add(t[col + 0][row - 1].id);
+    if (t[col + 1][row - 1].id > 0) ids.add(t[col + 1][row - 1].id);
+    if (t[col + 1][row + 0].id > 0) ids.add(t[col + 1][row + 0].id);
+    if (t[col + 1][row + 1].id > 0) ids.add(t[col + 1][row + 1].id);
+    if (t[col + 0][row + 1].id > 0) ids.add(t[col + 0][row + 1].id);
+    if (t[col - 1][row + 1].id > 0) ids.add(t[col - 1][row + 1].id);
+    if (t[col - 1][row + 0].id > 0) ids.add(t[col - 1][row + 0].id);
+    if (t[col - 1][row - 1].id > 0) ids.add(t[col - 1][row - 1].id);
+    return ids;
 }
 
 
@@ -322,15 +332,15 @@ int getFingerprint(Tile[][] t, int col, int row)
     if (row <= 0 || row >= TILE_ROWS - 1) return 0;
 
     if (INCLUDE_AUTOS_IN_FINGERPRINT)
-    return
-        t[col + 0][row - 1].id * 10000000 +
-        t[col + 1][row - 1].id * 1000000 +
-        t[col + 1][row + 0].id * 100000 +
-        t[col + 1][row + 1].id * 10000 +
-        t[col + 0][row + 1].id * 1000 +
-        t[col - 1][row + 1].id * 100 +
-        t[col - 1][row + 0].id * 10 +
-        t[col - 1][row - 1].id * 1;
+        return
+            t[col + 0][row - 1].id * 10000000 +
+            t[col + 1][row - 1].id * 1000000 +
+            t[col + 1][row + 0].id * 100000 +
+            t[col + 1][row + 1].id * 10000 +
+            t[col + 0][row + 1].id * 1000 +
+            t[col - 1][row + 1].id * 100 +
+            t[col - 1][row + 0].id * 10 +
+            t[col - 1][row - 1].id * 1;
 
     return
         (t[col + 0][row - 1].manual ? 1 : 0) * t[col + 0][row - 1].id * 10000000 +
