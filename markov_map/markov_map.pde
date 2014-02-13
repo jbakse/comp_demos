@@ -1,14 +1,15 @@
 import java.util.LinkedList;
 
-int TILE_SIZE = 8;
-int SCREEN_WIDTH = 1024;
-int SCREEN_HEIGHT = 768;
+int TILE_SIZE = 4;
+int SCREEN_WIDTH = 1920;
+int SCREEN_HEIGHT = 1000;
 int TILE_COLUMNS = SCREEN_WIDTH / TILE_SIZE;
 int TILE_ROWS = SCREEN_HEIGHT / TILE_SIZE;
 
 boolean GENERATE_RULES_FOR_MANUAL_ONLY = true;
 boolean GENERATE_RULES_FOR_ORPHANS = false;
 boolean INCLUDE_AUTOS_IN_FINGERPRINT = true;
+boolean INCLUDE_DIAGONALS_IN_FINGERPRINT = true;
 
 boolean APPLY_RULES_TO_ORPHANS = false;
 boolean APPLY_RULES_TO_EMPTY_ONLY = true;
@@ -34,7 +35,7 @@ Tile[][] tilesBackbuffer = new Tile[TILE_COLUMNS][TILE_ROWS];
 
 void setup()
 {
-    size(1024, 768);
+    size(SCREEN_WIDTH, SCREEN_HEIGHT);
     for (int row = 0; row < TILE_ROWS; row++)
     {
         for (int col = 0; col < TILE_COLUMNS; col++)
@@ -43,6 +44,8 @@ void setup()
             tilesBackbuffer[col][row] = new Tile();
         }
     }
+
+    cursor(CROSS);
 
 }
 
@@ -81,6 +84,14 @@ void draw()
 
             case 5:
                 fill(50, 50, 50);
+                break;
+
+            case 6:
+                fill(250, 250, 50);
+                break;
+
+            case 7:
+                fill(250, 250, 250);
                 break;
 
             }
@@ -143,6 +154,16 @@ void keyPressed()
     if (key == '5')
     {
         foreColor = 5;
+    }
+
+    if (key == '6')
+    {
+        foreColor = 6;
+    }
+
+    if (key == '7')
+    {
+        foreColor = 7;
     }
 
     if (key == ' ')
@@ -214,6 +235,11 @@ void stepMap()
     {
         for (int col = 0; col < TILE_COLUMNS; col++)
         {
+            //apply the calculated id only if not manually set
+            if (tiles[col][row].manual == true) continue;
+            if (tiles[col][row].id > 0 && APPLY_RULES_TO_EMPTY_ONLY) continue;
+
+
             //calculate the tile id
             int calculatedID = NO_MATCH_ID;//(int)random(1,4); // interesting
 
@@ -221,7 +247,7 @@ void stepMap()
             if (f != 0 || APPLY_RULES_TO_ORPHANS)   // interesting
             {
 
-                //create empty list to hold ids of tiles with fingerprint
+                //create empty list to hold ids of tiles with matched fingerprints
                 ArrayList<Integer> ids = new ArrayList<Integer>();
 
                 //find a wildcard matched fingerprints, add their ids
@@ -241,9 +267,6 @@ void stepMap()
             }
 
 
-            //apply the calculated id only if not manually set
-            if (tiles[col][row].manual == true) continue;
-            if (tiles[col][row].id > 0 && APPLY_RULES_TO_EMPTY_ONLY) continue;
 
             if (f != 0 && calculatedID == NO_MATCH_ID && APPLY_MANUAL_TO_NO_MATCH && manualIDs.size() > 0)
             {
@@ -332,23 +355,43 @@ int getFingerprint(Tile[][] t, int col, int row)
     if (row <= 0 || row >= TILE_ROWS - 1) return 0;
 
     if (INCLUDE_AUTOS_IN_FINGERPRINT)
-        return
+    {
+        int fingerprint =
             t[col + 0][row - 1].id * 10000000 +
-            t[col + 1][row - 1].id * 1000000 +
             t[col + 1][row + 0].id * 100000 +
-            t[col + 1][row + 1].id * 10000 +
             t[col + 0][row + 1].id * 1000 +
-            t[col - 1][row + 1].id * 100 +
-            t[col - 1][row + 0].id * 10 +
-            t[col - 1][row - 1].id * 1;
+            t[col - 1][row + 0].id * 10;
 
-    return
-        (t[col + 0][row - 1].manual ? 1 : 0) * t[col + 0][row - 1].id * 10000000 +
-        (t[col + 1][row - 1].manual ? 1 : 0) * t[col + 1][row - 1].id * 1000000 +
-        (t[col + 1][row + 0].manual ? 1 : 0) * t[col + 1][row + 0].id * 100000 +
-        (t[col + 1][row + 1].manual ? 1 : 0) * t[col + 1][row + 1].id * 10000 +
-        (t[col + 0][row + 1].manual ? 1 : 0) * t[col + 0][row + 1].id * 1000 +
-        (t[col - 1][row + 1].manual ? 1 : 0) * t[col - 1][row + 1].id * 100 +
-        (t[col - 1][row + 0].manual ? 1 : 0) * t[col - 1][row + 0].id * 10 +
-        (t[col - 1][row - 1].manual ? 1 : 0) * t[col - 1][row - 1].id * 1;
+        if (INCLUDE_DIAGONALS_IN_FINGERPRINT)
+        {
+            fingerprint +=
+                t[col + 1][row - 1].id * 1000000 +
+                t[col + 1][row + 1].id * 10000 +
+                t[col - 1][row + 1].id * 100 +
+                t[col - 1][row - 1].id * 1;
+        }
+
+        return fingerprint;
+    }
+    else
+    {
+
+        int fingerprint =
+            (t[col + 0][row - 1].manual ? 1 : 0) * t[col + 0][row - 1].id * 10000000 +
+            (t[col + 1][row + 0].manual ? 1 : 0) * t[col + 1][row + 0].id * 100000 +
+            (t[col + 0][row + 1].manual ? 1 : 0) * t[col + 0][row + 1].id * 1000 +
+            (t[col - 1][row + 0].manual ? 1 : 0) * t[col - 1][row + 0].id * 10;
+
+        if (INCLUDE_DIAGONALS_IN_FINGERPRINT)
+        {
+            fingerprint +=
+                (t[col + 1][row - 1].manual ? 1 : 0) * t[col + 1][row - 1].id * 1000000 +
+                (t[col + 1][row + 1].manual ? 1 : 0) * t[col + 1][row + 1].id * 10000 +
+                (t[col - 1][row + 1].manual ? 1 : 0) * t[col - 1][row + 1].id * 100 +
+                (t[col - 1][row - 1].manual ? 1 : 0) * t[col - 1][row - 1].id * 1;
+        }
+
+        return fingerprint;
+    }
+
 }
