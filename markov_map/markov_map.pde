@@ -8,12 +8,13 @@ int TILE_ROWS = SCREEN_HEIGHT / TILE_SIZE;
 
 boolean GENERATE_RULES_FOR_MANUAL_ONLY = true;
 boolean GENERATE_RULES_FOR_ORPHANS = false;
-int NO_MATCH_ID = 0;
 boolean APPLY_RULES_TO_ORPHANS = false;
 boolean ALLOW_NEEDLE_WILDCARD = true;
 boolean ALLOW_HAYSTACK_WILDCARD = false;
 boolean APPLY_RULES_TO_EMPTY_ONLY = true;
+boolean INCLUDE_AUTOS_IN_FINGERPRINT = true;
 
+int NO_MATCH_ID = 0;
 
 int foreColor = 1;
 
@@ -58,7 +59,7 @@ void draw()
                 break;
 
             case 1:
-                fill(0, 200, 0);
+                fill(0, 100, 0);
                 break;
 
             case 2:
@@ -67,6 +68,16 @@ void draw()
 
             case 3:
                 fill(150, 150, 150);
+                break;
+
+            case 4:
+                fill(100, 10, 10);
+                break;
+
+            case 5:
+                fill(50, 50, 50);
+                break;
+
             }
 
             noStroke();
@@ -77,11 +88,18 @@ void draw()
             rect(x, y, TILE_SIZE - 1, TILE_SIZE - 1);
         }
     }
-    stepMap();
+    if (!mousePressed)
+    {
+        //stepMap();
+    }
 }
 
-
 void mousePressed()
+{
+    mouseDragged();
+
+}
+void mouseDragged()
 {
     int col = mouseX / TILE_SIZE;
     int row = mouseY / TILE_SIZE;
@@ -105,6 +123,16 @@ void keyPressed()
     if (key == '3')
     {
         foreColor = 3;
+    }
+
+    if (key == '4')
+    {
+        foreColor = 4;
+    }
+
+    if (key == '5')
+    {
+        foreColor = 5;
     }
 
     if (key == ' ')
@@ -261,6 +289,7 @@ int getFingerprint(Tile[][] t, int col, int row)
     if (col <= 0 || col >= TILE_COLUMNS - 1) return 0;
     if (row <= 0 || row >= TILE_ROWS - 1) return 0;
 
+    if (INCLUDE_AUTOS_IN_FINGERPRINT)
     return
         t[col + 0][row - 1].id * 10000000 +
         t[col + 1][row - 1].id * 1000000 +
@@ -270,4 +299,14 @@ int getFingerprint(Tile[][] t, int col, int row)
         t[col - 1][row + 1].id * 100 +
         t[col - 1][row + 0].id * 10 +
         t[col - 1][row - 1].id * 1;
+
+    return
+        (t[col + 0][row - 1].manual ? 1 : 0) * t[col + 0][row - 1].id * 10000000 +
+        (t[col + 1][row - 1].manual ? 1 : 0) * t[col + 1][row - 1].id * 1000000 +
+        (t[col + 1][row + 0].manual ? 1 : 0) * t[col + 1][row + 0].id * 100000 +
+        (t[col + 1][row + 1].manual ? 1 : 0) * t[col + 1][row + 1].id * 10000 +
+        (t[col + 0][row + 1].manual ? 1 : 0) * t[col + 0][row + 1].id * 1000 +
+        (t[col - 1][row + 1].manual ? 1 : 0) * t[col - 1][row + 1].id * 100 +
+        (t[col - 1][row + 0].manual ? 1 : 0) * t[col - 1][row + 0].id * 10 +
+        (t[col - 1][row - 1].manual ? 1 : 0) * t[col - 1][row - 1].id * 1;
 }
