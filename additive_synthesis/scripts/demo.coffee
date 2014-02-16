@@ -62,7 +62,7 @@ class CanvasLayer
 
 
 sin_demo = ()->
-	world = new World(document.getElementById("sin-demo")).start()
+	world = new World(document.getElementById('sin-demo')).start()
 	layer = new CanvasLayer world
 
 
@@ -76,9 +76,9 @@ sin_demo = ()->
 
 	drawWaves = ()->
 		
-		sliderA = document.getElementById("sin-demo-slider-A").value
-		sliderB = document.getElementById("sin-demo-slider-B").value
-		sliderC = document.getElementById("sin-demo-slider-C").value
+		sliderA = document.getElementById('sin-demo-slider-A').value
+		sliderB = document.getElementById('sin-demo-slider-B').value
+		sliderC = document.getElementById('sin-demo-slider-C').value
 
 		c = layer.context
 
@@ -111,7 +111,7 @@ sin_demo = ()->
 
 
 	world.update = ()->
-		layer.blank "black"
+		layer.blank 'black'
 		drawWaves()
 		layer.update()
 
@@ -119,58 +119,205 @@ sin_demo()
 
 
 morie_demo = ()->
-	world = new World(document.getElementById("morie-demo")).start()
+	world = new World(document.getElementById('morie-demo')).start()
 	
+	circleBlur = THREE.ImageUtils.loadTexture 'images/circle_blur_64.png'
+	white = THREE.ImageUtils.loadTexture 'images/white_64.png'
+
+	blurMaterial = new THREE.MeshBasicMaterial
+		map: circleBlur
+		side: THREE.DoubleSide
+		transparent: true
+		blending: THREE.MultiplyBlending
+
 	blueMaterial = new THREE.MeshBasicMaterial
+		map: white
 		color: 0x0000ff
 		side: THREE.DoubleSide
+		transparent: true
+		blending: THREE.MultiplyBlending
 
 	redMaterial = new THREE.MeshBasicMaterial
+		map: white
 		color: 0xff0000
 		side: THREE.DoubleSide
+		transparent: true
+		blending: THREE.MultiplyBlending
 
-	circleGeometry = new THREE.CircleGeometry( .01, 32 );				
+	blackMaterial = new THREE.MeshBasicMaterial
+		map: white
+		color: 0x000000
+		side: THREE.DoubleSide
+
+	circleGeometry = new THREE.CircleGeometry( 1, 32 );				
 	
-	blueCircles = []
-	redCircles = []
-	rows = 20
-	cols = 40
+	groupA = new THREE.Object3D()
+	groupA.scale.set(.01, .01, .01);
+	world.scene.add groupA
+
+	groupB = new THREE.Object3D()
+	groupB.scale.set(.01, .01, .01);
+	world.scene.add groupB
+
+
+	
+
+
+	rows = 30
+	cols = 50
+	spacing = 2.5
 	
 	for i in [0..(rows * cols - 1)]
-		circle = new THREE.Mesh( circleGeometry, blueMaterial );
-		circle.row = Math.floor(i/cols)
-		circle.col = i%cols
-		world.scene.add( circle );
-		blueCircles.push circle
+		circle = new THREE.Mesh( circleGeometry, blurMaterial );
+		row = Math.floor(i/cols) - rows * .5
+		col = i%cols - cols * .5
+		circle.position.x = col * spacing 
+		circle.position.y = row * spacing 
+		groupA.add circle
 
 	for i in [0..(rows * cols - 1)]
-		circle = new THREE.Mesh( circleGeometry, redMaterial );
-		circle.row = Math.floor(i/cols)
-		circle.col = i%cols
-		world.scene.add( circle );
-		redCircles.push circle
+		circle = new THREE.Mesh( circleGeometry, blurMaterial );
+		row = Math.floor(i/cols) - rows * .5
+		col = i%cols - cols * .5
+		circle.position.x = col * spacing 
+		circle.position.y = row * spacing
+		circle.position.z = 1;
+		groupB.add circle
 
-	spacing = .025
+	
 
 	world.update = ()->
-		sliderA = document.getElementById("morie-demo-slider-A").value / 100.0
-		
-		if document.getElementById("morie-demo-color").checked
-			blueMaterial.color = new THREE.Color( 0x0000FF )
-			redMaterial.color = new THREE.Color( 0xFF0000 )
-		else
-			blueMaterial.color = new THREE.Color( 0x000000 )
-			redMaterial.color = new THREE.Color( 0x000000 )
+		sliderA = document.getElementById('morie-demo-slider-A').value / 100.0
+		sliderZoom = 1 + (document.getElementById('morie-demo-slider-Zoom').value / 100.0) * 6
+		material = document.getElementById('morie-demo-material').value
+		switch material
+			when "black"
+				for circle in groupA.children
+					circle.material = blackMaterial
+				for circle in groupB.children
+					circle.material = blackMaterial
 
-		redMaterial.needsUpdate = true
-		blueMaterial.needsUpdate = true
+			when "color"
+				for circle in groupA.children
+					circle.material = redMaterial
+				for circle in groupB.children
+					circle.material = blueMaterial
 
-		for circle in blueCircles
-			circle.position.x = -.5 + circle.col * spacing * (sliderA + 1)
-			circle.position.y = -.25 + circle.row * spacing * (sliderA + 1)
+			when "blur"
+				for circle in groupA.children
+					circle.material = blurMaterial
+				for circle in groupB.children
+					circle.material = blurMaterial
 
-		for circle in redCircles
-			circle.position.x = -.5 + circle.col * spacing * (0 + 1)
-			circle.position.y = -.25 + circle.row * spacing * (0 + 1)
+		groupA.rotation.z = sliderA * .25;
+		scale = (.01 + sliderA * .005) * sliderZoom
+		groupA.scale.set(scale, scale, scale)
+		groupA.position.set(sliderZoom * .1, sliderZoom * .1, 0)
+
+		scale = .01 * sliderZoom
+		groupB.scale.set(scale, scale, scale)
+		groupB.position.set(sliderZoom * .1, sliderZoom * .1, 0)
+
+
 
 morie_demo()
+
+
+
+noise_demo = ()->
+	world = new World(document.getElementById('noise-demo')).start()
+	layer = new CanvasLayer world
+	imageData = layer.context.createImageData(512,256);
+	pixels = imageData.data;
+	simplex = new SimplexNoise()
+	octaves = 1;
+	falloff = 1;
+
+	$('#noise-demo-slider-octaves').mouseup ()->
+		octaves = $('#noise-demo-slider-octaves').val()
+		drawNoise(octaves, falloff)
+
+	$('#noise-demo-slider-falloff').mouseup ()->
+		falloff = $('#noise-demo-slider-falloff').val() / 100
+		drawNoise(octaves, falloff)
+
+	noise = (x, y, octaves = 1, falloff = 1)->
+		n = 0
+		for octave in [1..octaves]
+			n += simplex.noise(x * octave, y * octave) * Math.pow(falloff, octave)
+		return Math.max(Math.min(1, n), 0)
+
+	
+	drawNoise = (octaves, falloff)->
+		scale = 5 / 255
+		for y in [0..255]
+			for x in [0..511]
+				pixels[(y * 512 + x) * 4 + 0]   = noise(x * scale, y * scale, octaves, falloff) * 255;
+				pixels[(y * 512 + x) * 4 + 1]   = noise(x * scale, y * scale, octaves, falloff) * 255;
+				pixels[(y * 512 + x) * 4 + 2]   = noise(x * scale, y * scale, octaves, falloff) * 255;
+				pixels[(y * 512 + x) * 4 + 3]   = 255;
+
+		layer.context.putImageData( imageData, 0, 0 );  
+		layer.update()
+
+	world.update = ()->
+		
+
+	drawNoise(octaves, falloff);
+noise_demo()
+
+
+shaping_demo = ()->
+	world = new World(document.getElementById('shaping-demo')).start()
+	
+	circleBlur = THREE.ImageUtils.loadTexture 'images/circle_light_blur_64.png'
+
+	blurMaterial = new THREE.MeshBasicMaterial
+		map: circleBlur
+		side: THREE.DoubleSide
+		transparent: true
+		blending: THREE.MultiplyBlending
+
+
+	circleGeometry = new THREE.CircleGeometry( 1, 32 );				
+	
+	groupA = new THREE.Object3D()
+	groupA.scale.set(.1, .1, .1);
+	groupA.position.setX(.5);
+	world.scene.add groupA
+
+	groupB = new THREE.Object3D()
+	groupB.scale.set(.1, .1, .1);
+	groupB.position.setX(.5);
+	world.scene.add groupB
+
+	
+	populate = (group, rows, cols, spacing)->
+		for i in [0..(rows * cols - 1)]
+			circle = new THREE.Mesh( circleGeometry, blurMaterial );
+			row = Math.floor(i/cols) - rows * .5
+			col = i%cols - cols * .5
+			circle.position.x = col * spacing 
+			circle.position.y = row * spacing 
+			group.add circle
+
+	populate groupA, 10, 10, 2.0
+	populate groupB, 10, 10, 1.5
+
+	
+	world.update = ()->
+		sliderA = document.getElementById('shaping-demo-slider-A').value / 100.0
+		
+
+		groupA.rotation.z = sliderA * .25;
+		# scale = (.01 + sliderA * .005) * sliderZoom
+		# groupA.scale.set(scale, scale, scale)
+		# groupA.position.set(sliderZoom * .1, sliderZoom * .1, 0)
+
+		# scale = .01 * sliderZoom
+		# groupB.scale.set(scale, scale, scale)
+		# groupB.position.set(sliderZoom * .1, sliderZoom * .1, 0)
+
+
+
+shaping_demo()
