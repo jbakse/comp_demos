@@ -423,6 +423,7 @@ shaping_demo = ()->
 		side: THREE.DoubleSide
 		uniforms:
 			"heightMap": { type: "t", value: heightMap }
+			"colorMap": { type: "t", value: colorMap }
 
 		vertexShader:
 			"""
@@ -442,11 +443,11 @@ shaping_demo = ()->
 
 		fragmentShader:
 			"""
-			uniform sampler2D heightMap;
+			uniform sampler2D colorMap;
 			varying vec2 vUv;
 
 			void main() {
-				vec4 texel = texture2D( heightMap, vUv );
+				vec4 texel = texture2D( colorMap, vUv );
 				texel.a = 1.0;
 				gl_FragColor = texel;
 			}
@@ -495,27 +496,64 @@ shaping_demo = ()->
 				
 				// use pow function to shape the slope of the gradient
 				o = pow( o, vec4(exponent, exponent, exponent, exponent) );
-  				
+				
 				// apply the mod
-  				o = mod( o, vec4(modLevel, modLevel, modLevel, modLevel)) / modLevel;
+				o = mod( o, vec4(modLevel, modLevel, modLevel, modLevel)) / modLevel;
 
-  				//make anything under thresholdMin 0.0
+				//make anything under thresholdMin 0.0
 				o = step(vec4(thresholdMin, thresholdMin, thresholdMin, thresholdMin), o) * o;
 				o += vec4(.1, .1, .1, .1);
 
 				// make anything over threshold max 1.0
 				o = o + step(  vec4(thresholdMax, thresholdMax, thresholdMax, thresholdMax), o );
-  				o = min( vec4(1.0, 1.0, 1.0, 1.0), o );
-  				
-
-  				
-
-  				// use the color lookup table to colorize the result
+				o = min( vec4(1.0, 1.0, 1.0, 1.0), o );
+			
+				// use the color lookup table to colorize the result
 				// o = texture2D( ramp, vec2(o.r, .95 - rampLevel));
 				// o = clamp(o, 0.0 , 1.0);
 				
 				// set the alpha to 1.0 as we don't intend on any plending
 				o.a = 1.0;
+				
+
+				// set the output color
+				gl_FragColor = o;
+			}
+			"""
+
+	coloringMaterial = new THREE.ShaderMaterial
+		side: THREE.DoubleSide
+		transparent: false
+		uniforms: 
+			"tDiffuse": { type: "t", value: heightMap }
+			"tRamp": { type: "t", value: islandRampTex }
+			"rampLevel": { type:"f", value: 0.0 }
+
+		vertexShader:
+			"""
+			varying vec2 vUv;
+
+			void main() {
+				vUv = uv;
+				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+			}
+			"""
+
+		fragmentShader:
+			"""
+			uniform sampler2D tDiffuse;
+			uniform sampler2D tRamp;
+			uniform float rampLevel;
+
+			varying vec2 vUv;
+
+			void main() {
+				// read the input color
+				vec4 o = texture2D( tDiffuse, vUv );
+			
+				//use the color lookup table to colorize the result
+				o = texture2D( tRamp, vec2(o.r, 1.0 - rampLevel));
+				
 				
 
 				// set the output color
@@ -541,7 +579,6 @@ shaping_demo = ()->
 			circle = new THREE.Mesh( circleGeometry, circleMaterial );
 			row = Math.floor(i/cols)
 			col = i%cols
-			console.log row, col
 			circle.position.x = col * spacing - (cols - 1) * spacing * .5
 			circle.position.y = row * spacing - (rows - 1) * spacing * .5
 			group.add circle
@@ -560,6 +597,7 @@ shaping_demo = ()->
 	processCamera.position.z = 0
 	processScene.add processCamera
 	processQuad = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), shapingMaterial );
+	processQuad.rotation.x = Math.PI
 	processScene.add processQuad
 
 	# set up world scene
@@ -622,9 +660,9 @@ shaping_demo = ()->
 		mod = document.getElementById('shaping-demo-slider-mod').value / 100.0
 		shapingMaterial.uniforms[ 'modLevel' ].value = mod;
 
-		# ramp = document.getElementById('shaping-demo-slider-ramp').value / 100.0
-		# effect.uniforms[ 'rampLevel' ].value = ramp;
-		
+		ramp = document.getElementById('shaping-demo-slider-ramp').value / 100.0
+		coloringMaterial.uniforms[ 'rampLevel' ].value = ramp;
+
 		##
 		# animation
 
@@ -639,6 +677,10 @@ shaping_demo = ()->
 		# shape baseTexture, store in heightMap
 		processQuad.material = shapingMaterial
 		world.renderer.render( processScene, processCamera, heightMap, true);
+
+		# color heightMap, store in colorMap
+		processQuad.material = coloringMaterial
+		world.renderer.render( processScene, processCamera, colorMap, true);
 
 
 
@@ -716,9 +758,9 @@ shaping_demo();
 	# 			// make anything over threshold max 1.0
 	# 			o = o + step(  vec4(thresholdMax, thresholdMax, thresholdMax, thresholdMax), o );
  #  				o = min( vec4(1.0, 1.0, 1.0, 1.0), o );
-  				
+				
 
-  				
+				
 
  #  				// use the color lookup table to colorize the result
 	# 			o = texture2D( ramp, vec2(o.r, .95 - rampLevel));
