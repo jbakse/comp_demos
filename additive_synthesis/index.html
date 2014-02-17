@@ -10,8 +10,17 @@
 
 	<script src="lib/jquery-2.1.0.min.js"></script>
 	<script src="lib/coffee-script.js"></script>
-	<script src="lib/three.min.js"></script>
+	<script src="lib/three/three.min.js"></script>
+	
+	<script src="lib/three/shaders/CopyShader.js"></script>
+	<script src="lib/three/postprocessing/EffectComposer.js"></script>
+	<script src="lib/three/postprocessing/RenderPass.js"></script>
+	<script src="lib/three/postprocessing/MaskPass.js"></script>
+	<script src="lib/three/postprocessing/ShaderPass.js"></script>
+
+
 	<script src="lib/SimplexNoise.js"></script>
+
 
 </head>
 <body>
@@ -19,6 +28,12 @@
 	<div id="shaping-demo" class="demo"></div>
 	<div class = "demo-controls">
 		A <input id="shaping-demo-slider-A" type="range" min="2" max="100" value="20">
+		Exponent <input id="shaping-demo-slider-exponent" type="range" min="1" max="500" value="100">
+		Min<input id="shaping-demo-slider-min" type="range" min="0" max="100" value="0">
+		Max<input id="shaping-demo-slider-max" type="range" min="0" max="100" value="100">
+		Mod<input id="shaping-demo-slider-mod" type="range" min="0" max="101" value="101">
+		Ramp<input id="shaping-demo-slider-ramp" type="range" min="0" max="100" value="0">
+
 	</div>
 
 

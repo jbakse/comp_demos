@@ -9,6 +9,8 @@ class World
 		@scene = new THREE.Scene()
 
 		@camera = new THREE.OrthographicCamera(-.5, .5, -.5 / @aspect  , .5 / @aspect , 1, 1000)
+		# @camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
 		@camera.position.z = 5
 		@scene.add @camera
 
@@ -20,10 +22,18 @@ class World
 		
 	update: false
 
+	composer: false
+
 	_render_loop: ()->
 		requestAnimationFrame ()=> @_render_loop()
 		@update?()
-		@renderer.render @scene, @camera
+		# console.log @composer
+		if @composer != false
+			# console.log "c"
+			@composer.render()
+		else
+			# console.log "r"
+			@renderer.render @scene, @camera
 
 	start: ()->
 		@_render_loop()
@@ -270,7 +280,83 @@ noise_demo()
 shaping_demo = ()->
 	world = new World(document.getElementById('shaping-demo')).start()
 	
-	circleBlur = THREE.ImageUtils.loadTexture 'images/circle_light_blur_64.png'
+	circleBlur = THREE.ImageUtils.loadTexture 'images/gradient_64.png'
+	colorRamp = THREE.ImageUtils.loadTexture 'images/island_ramp_256.png'
+
+	
+
+
+	ExponentShader = 
+
+		uniforms: 
+			"tDiffuse": { type: "t", value: null }
+			"ramp": { type: "t", value: null }
+			"exponent": { type:"f", value: 1.0 }
+			"thresholdMin": { type:"f", value: 0.0 }
+			"thresholdMax": { type:"f", value: 1.0 }
+			"modLevel": { type:"f", value: 1.01 }
+			"rampLevel": { type:"f", value: 1.01 }
+
+		vertexShader:
+			"""
+			varying vec2 vUv;
+			void main() {
+				vUv = uv;
+				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+			}
+			"""
+
+		fragmentShader:
+			"""
+			uniform sampler2D tDiffuse;
+			uniform sampler2D ramp;
+			uniform float exponent;
+			uniform float thresholdMin;
+			uniform float thresholdMax;
+			uniform float modLevel;
+			uniform float rampLevel;
+
+			varying vec2 vUv;
+
+			void main() {
+				vec4 texel = texture2D( tDiffuse, vUv );
+				vec4 o = pow( clamp(texel, 0.0 , 1.0), vec4(exponent, exponent, exponent, exponent) );
+  				o = mod( o, vec4(modLevel, modLevel, modLevel, modLevel)) / modLevel;
+  				//o = sin( o * vec4(3.14159 * rings, 3.14159 * rings, 3.14159 * rings, 3.14159 * rings)) * .5 + .5;
+				
+  				//make anything under thresholdMin 0.0
+				o = step(vec4(thresholdMin, thresholdMin, thresholdMin, thresholdMin), o) * o;
+				o += vec4(.1, .1, .1, .1);
+
+				// make anything over threshold max 1.0
+				o = o + step(  vec4(thresholdMax, thresholdMax, thresholdMax, thresholdMax), o );
+  				o = min( vec4(1.0, 1.0, 1.0, 1.0), o );
+  				
+
+  				
+
+  				// use the color lookup table to colorize the result
+				o = texture2D( ramp, vec2(o.r, .95 - rampLevel));
+
+				o = clamp(o, 0.0 , 1.0);
+				o.a = 1.0;
+				
+				gl_FragColor = o;
+			}
+			"""
+
+	composer = new THREE.EffectComposer( world.renderer );
+	composer.addPass( new THREE.RenderPass( world.scene, world.camera ) );
+	effect = new THREE.ShaderPass( ExponentShader );
+	console.log effect.uniforms
+	effect.uniforms['ramp'].value = colorRamp
+
+	effect.renderToScreen = true
+
+	# effect.uniforms[ 'scale' ].value = 4;
+	composer.addPass( effect )
+	world.composer = composer
+	console.log world.composer
 
 	blurMaterial = new THREE.MeshBasicMaterial
 		map: circleBlur
@@ -307,9 +393,23 @@ shaping_demo = ()->
 	
 	world.update = ()->
 		sliderA = document.getElementById('shaping-demo-slider-A').value / 100.0
-		
-
 		groupA.rotation.z = sliderA * .25;
+
+		exponent = document.getElementById('shaping-demo-slider-exponent').value / 100.0
+		effect.uniforms[ 'exponent' ].value = exponent;
+
+		min = document.getElementById('shaping-demo-slider-min').value / 100.0
+		effect.uniforms[ 'thresholdMin' ].value = min;
+
+		max = document.getElementById('shaping-demo-slider-max').value / 100.0
+		effect.uniforms[ 'thresholdMax' ].value = max;
+
+		mod = document.getElementById('shaping-demo-slider-mod').value / 100.0
+		effect.uniforms[ 'modLevel' ].value = mod;
+
+		ramp = document.getElementById('shaping-demo-slider-ramp').value / 100.0
+		effect.uniforms[ 'rampLevel' ].value = ramp;
+
 		# scale = (.01 + sliderA * .005) * sliderZoom
 		# groupA.scale.set(scale, scale, scale)
 		# groupA.position.set(sliderZoom * .1, sliderZoom * .1, 0)
@@ -321,3 +421,5 @@ shaping_demo = ()->
 
 
 shaping_demo()
+
+
