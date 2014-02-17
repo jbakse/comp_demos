@@ -374,41 +374,64 @@ class CanvasLayer
 shaping_demo = ()->
 	world = new World(document.getElementById('shaping-demo')).start()
 	
-	# setup render texture (rt) 
-	rtScene = new THREE.Scene()
-	rtCamera = new THREE.OrthographicCamera(-.5, .5, -.5  , .5  , 1, 1000)
-	rtCamera.position.z = 5
-	rtScene.add rtCamera
-	rtTexture = new THREE.WebGLRenderTarget 512, 512, {
+	##
+	# load texture assets
+	
+	islandRampTex = THREE.ImageUtils.loadTexture 'images/island_ramp_256.png'
+	gradientTex = THREE.ImageUtils.loadTexture 'images/gradient_64.png'
+
+
+	##
+	# setup render textures
+
+	# base texture holds the initial dots
+	baseTexture = new THREE.WebGLRenderTarget 512, 512, {
+		minFilter: THREE.LinearFilter
+		magFilter: THREE.NearestFilter
+		format: THREE.RGBFormat
+	}
+
+	# heightMap is the result of shaping the baseTexture
+	# used to control height of the island
+	heightMap = new THREE.WebGLRenderTarget 512, 512, {
+		minFilter: THREE.LinearFilter
+		magFilter: THREE.NearestFilter
+		format: THREE.RGBFormat
+	}
+
+	# colorMap is the result of applying the color ramp to the height map
+	# used to color the island
+	colorMap = new THREE.WebGLRenderTarget 512, 512, {
 		minFilter: THREE.LinearFilter
 		magFilter: THREE.NearestFilter
 		format: THREE.RGBFormat
 	}
 
 
-	# set up world geom
-	colorRamp = THREE.ImageUtils.loadTexture 'images/island_ramp_256.png'
-	
+	##
+	# setup materials
 
-	material2 = new THREE.MeshBasicMaterial
-		color: 0xffffff
+	#draws the initial circles
+	circleMaterial = new THREE.MeshBasicMaterial
+		map: gradientTex
 		side: THREE.DoubleSide
-		map: rtTexture
+		transparent: true
+		blending: THREE.MultiplyBlending
 
+	#used to displace and color the island plane
 	islandMaterial = new THREE.ShaderMaterial
-
 		side: THREE.DoubleSide
-
 		uniforms:
-			"tex": { type: "t", value: null }
+			"heightMap": { type: "t", value: heightMap }
 
 		vertexShader:
 			"""
-			uniform sampler2D tex;
+			uniform sampler2D heightMap;
 			varying vec2 vUv;
+
 			void main() {
 				vUv = uv;
-				vec4 texel = texture2D( tex, vUv );
+				vec4 texel = texture2D( heightMap, vUv );
 
 				vec3 p = position;
 				p.z += texel.r * .1;
@@ -419,50 +442,32 @@ shaping_demo = ()->
 
 		fragmentShader:
 			"""
-			uniform sampler2D tex;
-
+			uniform sampler2D heightMap;
 			varying vec2 vUv;
 
 			void main() {
-				vec4 texel = texture2D( tex, vUv );
-				
+				vec4 texel = texture2D( heightMap, vUv );
 				texel.a = 1.0;
 				gl_FragColor = texel;
 			}
 			"""
 
-	islandMaterial.uniforms.tex.value = rtTexture;
-
-	planeGeometry = new THREE.PlaneGeometry( 1, 1, 100, 100);
-	plane = new THREE.Mesh( planeGeometry, islandMaterial );
-	plane.scale.set(.5, .5, .5)
-	plane.position.x = .25
-	plane.rotation.x = Math.PI * -.6
-	# plane.rotation.z = Math.PI * -.4;
-	# plane.rotation.x = Math.PI * -.6;
-	world.scene.add plane
-
-
-	
-
-
-
-	
-
-
-	ExponentShader = 
+	shapingMaterial = new THREE.ShaderMaterial
+		side: THREE.DoubleSide
+		transparent: false
 		uniforms: 
-			"tDiffuse": { type: "t", value: null }
-			"ramp": { type: "t", value: null }
+			"tDiffuse": { type: "t", value: baseTexture }
 			"exponent": { type:"f", value: 1.0 }
 			"thresholdMin": { type:"f", value: 0.0 }
 			"thresholdMax": { type:"f", value: 1.0 }
 			"modLevel": { type:"f", value: 1.01 }
-			"rampLevel": { type:"f", value: 1.01 }
+			# "ramp": { type: "t", value: null }
+			# "rampLevel": { type:"f", value: 1.01 }
 
 		vertexShader:
 			"""
 			varying vec2 vUv;
+
 			void main() {
 				vUv = uv;
 				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
@@ -472,21 +477,28 @@ shaping_demo = ()->
 		fragmentShader:
 			"""
 			uniform sampler2D tDiffuse;
-			uniform sampler2D ramp;
 			uniform float exponent;
 			uniform float thresholdMin;
 			uniform float thresholdMax;
 			uniform float modLevel;
-			uniform float rampLevel;
+			//uniform float rampLevel;
+			//uniform sampler2D ramp;
 
 			varying vec2 vUv;
 
 			void main() {
-				vec4 texel = texture2D( tDiffuse, vUv );
-				vec4 o = pow( clamp(texel, 0.0 , 1.0), vec4(exponent, exponent, exponent, exponent) );
-  				o = mod( o, vec4(modLevel, modLevel, modLevel, modLevel)) / modLevel;
-  				//o = sin( o * vec4(3.14159 * rings, 3.14159 * rings, 3.14159 * rings, 3.14159 * rings)) * .5 + .5;
+				// read the input color
+				vec4 o = texture2D( tDiffuse, vUv );
+
+				// make sure it is in the expected range
+				o = clamp(o, 0.0 , 1.0);
 				
+				// use pow function to shape the slope of the gradient
+				o = pow( o, vec4(exponent, exponent, exponent, exponent) );
+  				
+				// apply the mod
+  				o = mod( o, vec4(modLevel, modLevel, modLevel, modLevel)) / modLevel;
+
   				//make anything under thresholdMin 0.0
 				o = step(vec4(thresholdMin, thresholdMin, thresholdMin, thresholdMin), o) * o;
 				o += vec4(.1, .1, .1, .1);
@@ -499,64 +511,145 @@ shaping_demo = ()->
   				
 
   				// use the color lookup table to colorize the result
-				o = texture2D( ramp, vec2(o.r, .95 - rampLevel));
-
-				o = clamp(o, 0.0 , 1.0);
+				// o = texture2D( ramp, vec2(o.r, .95 - rampLevel));
+				// o = clamp(o, 0.0 , 1.0);
+				
+				// set the alpha to 1.0 as we don't intend on any plending
 				o.a = 1.0;
 				
+
+				// set the output color
 				gl_FragColor = o;
 			}
 			"""
 
-	# composer = new THREE.EffectComposer( world.renderer, rtTexture );
-	# composer.addPass( new THREE.RenderPass( world.scene, world.camera ) );
 
-	# effect = new THREE.ShaderPass( ExponentShader );
-	# effect.uniforms['ramp'].value = colorRamp
-	# # effect.renderToScreen = true
-	# composer.addPass( effect )
-	# world.composer = composer
+	##
+	# setup scenes
 
-	
-
-	circleBlur = THREE.ImageUtils.loadTexture 'images/gradient_64.png'
-	circleMaterial = new THREE.MeshBasicMaterial
-		map: circleBlur
-		side: THREE.DoubleSide
-		transparent: true
-		blending: THREE.MultiplyBlending
+	# set up base scene
+	baseScene = new THREE.Scene()
+	baseCamera = new THREE.OrthographicCamera(-.5, .5, -.5  , .5  , 1, 1000)
+	baseCamera.position.z = 5
+	baseScene.add baseCamera
 
 	circleGeometry = new THREE.CircleGeometry( 1, 32 );				
 	
-	populate = (group, rows, cols, spacing)->
+	setUpCircleGroup = (group, rows, cols, spacing)->
+		group.scale.set(.1, .1, .1);
 		for i in [0..(rows * cols - 1)]
 			circle = new THREE.Mesh( circleGeometry, circleMaterial );
-			row = Math.floor(i/cols) - rows * .5
-			col = i%cols - cols * .5
-			circle.position.x = col * spacing 
-			circle.position.y = row * spacing 
+			row = Math.floor(i/cols)
+			col = i%cols
+			console.log row, col
+			circle.position.x = col * spacing - (cols - 1) * spacing * .5
+			circle.position.y = row * spacing - (rows - 1) * spacing * .5
 			group.add circle
 
 	groupA = new THREE.Object3D()
-	groupA.scale.set(.1, .1, .1);
-	groupA.position.setX(.5);
-	rtScene.add groupA
-	populate groupA, 10, 10, 2.0
+	setUpCircleGroup groupA, 4, 4, 2.0
+	baseScene.add groupA
 
 	groupB = new THREE.Object3D()
-	groupB.scale.set(.1, .1, .1);
-	groupB.position.setX(.5);
-	rtScene.add groupB
-	populate groupB, 10, 10, 1.5
+	setUpCircleGroup groupB, 4, 4, 1.5
+	baseScene.add groupB
 
-	
+	#set up post process scene
+	processScene = new THREE.Scene()
+	processCamera = new THREE.OrthographicCamera(-.5, .5, -.5 , .5, 0, 1)
+	processCamera.position.z = 0
+	processScene.add processCamera
+	processQuad = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), shapingMaterial );
+	processScene.add processQuad
 
+	# set up world scene
 
+	planeGeometry = new THREE.PlaneGeometry( 1, 1);
+	basePlane = new THREE.Mesh planeGeometry, 
+		new THREE.MeshBasicMaterial
+			map: baseTexture
+			side: THREE.DoubleSide
+	basePlane.position.set(-.4,-.15,-20)
+	basePlane.scale.set(.25,.25,.25);
+	world.scene.add basePlane
 
-	
+	# plane used to show the heightmap
+	heightPlane = new THREE.Mesh planeGeometry, 
+		new THREE.MeshBasicMaterial
+			map: heightMap
+			side: THREE.DoubleSide
+	heightPlane.position.set(-.1,-.15,-20)
+	heightPlane.scale.set(.25,.25,.25);
+	world.scene.add heightPlane
+
+	# plane used to show the colormap
+	colorPlane = new THREE.Mesh planeGeometry, 
+		new THREE.MeshBasicMaterial
+			map: colorMap
+			side: THREE.DoubleSide
+	colorPlane.position.set(.2,-.15,-20)
+	colorPlane.scale.set(.25,.25,.25);
+	world.scene.add colorPlane
+
+	# plane that shows the 3d island
+	islandGeometry = new THREE.PlaneGeometry( 1, 1, 100, 100);
+	islandPlane = new THREE.Mesh( islandGeometry, islandMaterial );
+	islandPlane.scale.set(.5, .5, .5)
+	islandPlane.position.set(.1,.1,0)
+	islandPlane.rotation.x = Math.PI * - .65
+	world.scene.add islandPlane
+
+	##
+	# main animation loop
+
 	world.update = ()->
+		
+		##
+		# inputs
+
 		sliderA = document.getElementById('shaping-demo-slider-A').value / 100.0
 		groupA.rotation.z = sliderA * .25;
+
+		exponent = document.getElementById('shaping-demo-slider-exponent').value / 100.0
+		shapingMaterial.uniforms[ 'exponent' ].value = exponent;
+
+		min = document.getElementById('shaping-demo-slider-min').value / 100.0
+		shapingMaterial.uniforms[ 'thresholdMin' ].value = min;
+
+		max = document.getElementById('shaping-demo-slider-max').value / 100.0
+		shapingMaterial.uniforms[ 'thresholdMax' ].value = max;
+
+		mod = document.getElementById('shaping-demo-slider-mod').value / 100.0
+		shapingMaterial.uniforms[ 'modLevel' ].value = mod;
+
+		# ramp = document.getElementById('shaping-demo-slider-ramp').value / 100.0
+		# effect.uniforms[ 'rampLevel' ].value = ramp;
+		
+		##
+		# animation
+
+		islandPlane.rotation.z += .01;
+
+		##
+		# render sequence
+		
+		# render the circles into baseTexture
+		world.renderer.render( baseScene, baseCamera, baseTexture, true );
+
+		# shape baseTexture, store in heightMap
+		processQuad.material = shapingMaterial
+		world.renderer.render( processScene, processCamera, heightMap, true);
+
+
+
+
+shaping_demo();
+
+
+
+
+
+
 
 		# exponent = document.getElementById('shaping-demo-slider-exponent').value / 100.0
 		# effect.uniforms[ 'exponent' ].value = exponent;
@@ -576,14 +669,75 @@ shaping_demo = ()->
 		
 		# plane.rotation.z += .01;
 		# composer.render()
-		world.renderer.render( rtScene, rtCamera, rtTexture, true );
 
 
 
+	# ExponentShader = 
+	# 	uniforms: 
+	# 		"tDiffuse": { type: "t", value: null }
+	# 		"ramp": { type: "t", value: null }
+	# 		"exponent": { type:"f", value: 1.0 }
+	# 		"thresholdMin": { type:"f", value: 0.0 }
+	# 		"thresholdMax": { type:"f", value: 1.0 }
+	# 		"modLevel": { type:"f", value: 1.01 }
+	# 		"rampLevel": { type:"f", value: 1.01 }
 
-shaping_demo();
+	# 	vertexShader:
+	# 		"""
+	# 		varying vec2 vUv;
+	# 		void main() {
+	# 			vUv = uv;
+	# 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+	# 		}
+	# 		"""
 
+	# 	fragmentShader:
+	# 		"""
+	# 		uniform sampler2D tDiffuse;
+	# 		uniform sampler2D ramp;
+	# 		uniform float exponent;
+	# 		uniform float thresholdMin;
+	# 		uniform float thresholdMax;
+	# 		uniform float modLevel;
+	# 		uniform float rampLevel;
 
+	# 		varying vec2 vUv;
+
+	# 		void main() {
+	# 			vec4 texel = texture2D( tDiffuse, vUv );
+	# 			vec4 o = pow( clamp(texel, 0.0 , 1.0), vec4(exponent, exponent, exponent, exponent) );
+ #  				o = mod( o, vec4(modLevel, modLevel, modLevel, modLevel)) / modLevel;
+ #  				//o = sin( o * vec4(3.14159 * rings, 3.14159 * rings, 3.14159 * rings, 3.14159 * rings)) * .5 + .5;
+				
+ #  				//make anything under thresholdMin 0.0
+	# 			o = step(vec4(thresholdMin, thresholdMin, thresholdMin, thresholdMin), o) * o;
+	# 			o += vec4(.1, .1, .1, .1);
+
+	# 			// make anything over threshold max 1.0
+	# 			o = o + step(  vec4(thresholdMax, thresholdMax, thresholdMax, thresholdMax), o );
+ #  				o = min( vec4(1.0, 1.0, 1.0, 1.0), o );
+  				
+
+  				
+
+ #  				// use the color lookup table to colorize the result
+	# 			o = texture2D( ramp, vec2(o.r, .95 - rampLevel));
+
+	# 			o = clamp(o, 0.0 , 1.0);
+	# 			o.a = 1.0;
+				
+	# 			gl_FragColor = o;
+	# 		}
+	# 		"""
+
+	# composer = new THREE.EffectComposer( world.renderer, rtTexture );
+	# composer.addPass( new THREE.RenderPass( world.scene, world.camera ) );
+
+	# effect = new THREE.ShaderPass( ExponentShader );
+	# effect.uniforms['ramp'].value = colorRamp
+	# # effect.renderToScreen = true
+	# composer.addPass( effect )
+	# world.composer = composer
 
 
 
