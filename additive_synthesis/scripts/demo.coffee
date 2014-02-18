@@ -1,237 +1,164 @@
-#boiler plate
+additive_demo = (el)->
+	world = new World(el).start()
+	layer = new CanvasLayer world
 
-class World
-	constructor: (@element)->
-		@width  = @element.clientWidth
-		@height = @element.clientHeight
-		@aspect = @width / @height 
-		
-		@scene = new THREE.Scene()
-
-		@camera = new THREE.OrthographicCamera(-.5, .5, -.5 / @aspect  , .5 / @aspect , 1, 1000)
-		# @camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-
-		@camera.position.z = 5
-		@scene.add @camera
-
-		@renderer = new THREE.WebGLRenderer()
-		# @renderer.antialias = true
-		@renderer.setClearColor 0xFFFFFF, 1
-		@renderer.setSize @element.clientWidth, @element.clientHeight
-		@element.appendChild @renderer.domElement
-		
-	update: false
-
-	composer: false
-
-	_render_loop: ()->
-		requestAnimationFrame ()=> @_render_loop()
-		@update?()
-		# console.log @composer
-		if @composer != false
-			# console.log "c"
-			@composer.render()
-		else
-			# console.log "r"
-			# @renderer.clear();
-			@renderer.render @scene, @camera
-
-	start: ()->
-		@_render_loop()
-		this
-
-class CanvasLayer
-	constructor: (@world)->
-
-		canvas = document.createElement 'canvas' 
-		canvas.width = 512
-		canvas.height = 256
+	plot = (context, start, end, f)->
+		context.beginPath();
+		context.moveTo 0, 0
+		for x in [start..end]
+			context.lineTo x, f(x) 
+		context.stroke()
 
 
-		@_canvasTexture = new THREE.Texture(canvas) 
-		@_canvasTexture.needsUpdate = true
+	drawWaves = ()->
+		sliderA = document.getElementById('sin-demo-slider-a').value
+		sliderB = document.getElementById('sin-demo-slider-b').value
+		sliderC = document.getElementById('sin-demo-slider-c').value
+
+		c = layer.context
+
+		c.save()
+
+		c.strokeStyle = 'white'
+		c.translate 0, 32
+		plot c, 0, 512, (x)->
+			Math.sin(x/512 * Math.PI * sliderA) * 18
+
+		c.translate 0, 58
+		plot c, 0, 512, (x)->
+			Math.sin(x/512 * Math.PI * sliderB) * 12
+
+		c.translate 0, 50
+		plot c, 0, 512, (x)->
+			Math.sin(x/512 * Math.PI * sliderC) * 8
 
 
-		canvasMaterial = new THREE.MeshBasicMaterial
-			map: @_canvasTexture
+		c.strokeStyle = 'red'
+		c.translate 0, 64
+		plot c, 0, 512, (x)->
+			 Math.sin(x/512 * Math.PI * sliderA) * 18 + 
+			 Math.sin(x/512 * Math.PI * sliderB) * 12 + 
+			 Math.sin(x/512 * Math.PI * sliderC) * 8
 
-		planeGeometry = new THREE.PlaneGeometry 1, 1 / @world.aspect 
-		mesh = new THREE.Mesh planeGeometry, canvasMaterial 
-		mesh.rotation.x = Math.PI
-		@world.scene.add mesh
-
-		@context = canvas.getContext '2d'
-
-	update: ()->
-		@_canvasTexture.needsUpdate = true;
-
-	blank: (color)->
-		@context.beginPath();
-		@context.rect(0, 0, 512, 512);
-		@context.fillStyle = color;
-		@context.fill();
+		c.restore()
 
 
-# sin_demo = ()->
-# 	world = new World(document.getElementById('sin-demo')).start()
-# 	layer = new CanvasLayer world
+	world.update = ()->
+		layer.blank 'black'
+		drawWaves()
+		layer.update()
 
 
-# 	plot = (context, start, end, f)->
-# 		context.beginPath();
-# 		context.moveTo 0, 0
-# 		for x in [start..end]
-# 			context.lineTo x, f(x) 
-# 		context.stroke()
 
 
-# 	drawWaves = ()->
-		
-# 		sliderA = document.getElementById('sin-demo-slider-A').value
-# 		sliderB = document.getElementById('sin-demo-slider-B').value
-# 		sliderC = document.getElementById('sin-demo-slider-C').value
-
-# 		c = layer.context
-
-# 		c.save()
-
-# 		c.strokeStyle = 'white'
-
-# 		c.translate 0, 32
-# 		plot c, 0, 512, (x)->
-# 			Math.sin(x/512 * Math.PI * sliderA) * 24
-
-# 		c.translate 0, 64
-# 		plot c, 0, 512, (x)->
-# 			Math.sin(x/512 * Math.PI * sliderB) * 18
-
-# 		c.translate 0, 64
-# 		plot c, 0, 512, (x)->
-# 			Math.sin(x/512 * Math.PI * sliderC) * 12
-
-
-# 		c.strokeStyle = 'red'
-
-# 		c.translate 0, 64
-# 		plot c, 0, 512, (x)->
-# 			 Math.sin(x/512 * Math.PI * sliderA) * 10 + 
-# 			 Math.sin(x/512 * Math.PI * sliderB) * 7.5 + 
-# 			 Math.sin(x/512 * Math.PI * sliderC) * 5
-
-# 		c.restore()
-
-
-# 	world.update = ()->
-# 		layer.blank 'black'
-# 		drawWaves()
-# 		layer.update()
-
-# sin_demo()
-
-
-# morie_demo = ()->
-# 	world = new World(document.getElementById('morie-demo')).start()
+morie_demo = ()->
+	world = new World(document.getElementById('morie-demo')).start()
 	
-# 	circleBlur = THREE.ImageUtils.loadTexture 'images/circle_blur_64.png'
-# 	white = THREE.ImageUtils.loadTexture 'images/white_64.png'
+	##
+	# load textures
 
-# 	blurMaterial = new THREE.MeshBasicMaterial
-# 		map: circleBlur
-# 		side: THREE.DoubleSide
-# 		transparent: true
-# 		blending: THREE.MultiplyBlending
+	circleBlur = THREE.ImageUtils.loadTexture 'images/circle_blur_64.png'
+	white = THREE.ImageUtils.loadTexture 'images/white_64.png'
 
-# 	blueMaterial = new THREE.MeshBasicMaterial
-# 		map: white
-# 		color: 0x0000ff
-# 		side: THREE.DoubleSide
-# 		transparent: true
-# 		blending: THREE.MultiplyBlending
+	##
+	# setup materials
 
-# 	redMaterial = new THREE.MeshBasicMaterial
-# 		map: white
-# 		color: 0xff0000
-# 		side: THREE.DoubleSide
-# 		transparent: true
-# 		blending: THREE.MultiplyBlending
+	blurMaterial = new THREE.MeshBasicMaterial
+		map: circleBlur
+		side: THREE.DoubleSide
+		transparent: true
+		blending: THREE.MultiplyBlending
 
-# 	blackMaterial = new THREE.MeshBasicMaterial
-# 		map: white
-# 		color: 0x000000
-# 		side: THREE.DoubleSide
+	blueMaterial = new THREE.MeshBasicMaterial
+		map: white
+		color: 0x0000ff
+		side: THREE.DoubleSide
+		transparent: true
+		blending: THREE.MultiplyBlending
 
-# 	circleGeometry = new THREE.CircleGeometry( 1, 32 );				
+	redMaterial = new THREE.MeshBasicMaterial
+		map: white
+		color: 0xff0000
+		side: THREE.DoubleSide
+		transparent: true
+		blending: THREE.MultiplyBlending
+
+	blackMaterial = new THREE.MeshBasicMaterial
+		map: white
+		color: 0x000000
+		side: THREE.DoubleSide
+
+
+	##
+	# create the circles
+
+	circleGeometry = new THREE.CircleGeometry( 1, 32 );				
 	
-# 	groupA = new THREE.Object3D()
-# 	groupA.scale.set(.01, .01, .01);
-# 	world.scene.add groupA
+	groupA = new THREE.Object3D()
+	groupA.scale.set(.01, .01, .01);
+	world.scene.add groupA
 
-# 	groupB = new THREE.Object3D()
-# 	groupB.scale.set(.01, .01, .01);
-# 	world.scene.add groupB
+	groupB = new THREE.Object3D()
+	groupB.scale.set(.01, .01, .01);
+	world.scene.add groupB
 
+	rows = 30
+	cols = 50
+	spacing = 2.5
+	
+	for i in [0..(rows * cols - 1)]
+		circle = new THREE.Mesh( circleGeometry, blurMaterial );
+		row = Math.floor(i/cols) - rows * .5
+		col = i%cols - cols * .5
+		circle.position.x = col * spacing 
+		circle.position.y = row * spacing 
+		groupA.add circle
+
+	for i in [0..(rows * cols - 1)]
+		circle = new THREE.Mesh( circleGeometry, blurMaterial );
+		row = Math.floor(i/cols) - rows * .5
+		col = i%cols - cols * .5
+		circle.position.x = col * spacing 
+		circle.position.y = row * spacing
+		circle.position.z = 1;
+		groupB.add circle
 
 	
 
+	world.update = ()->
+		sliderA = document.getElementById('morie-demo-slider-A').value / 100.0
+		sliderZoom = 1 + (document.getElementById('morie-demo-slider-Zoom').value / 100.0) * 6
+		material = document.getElementById('morie-demo-material').value
+		switch material
+			when "black"
+				for circle in groupA.children
+					circle.material = blackMaterial
+				for circle in groupB.children
+					circle.material = blackMaterial
 
-# 	rows = 30
-# 	cols = 50
-# 	spacing = 2.5
-	
-# 	for i in [0..(rows * cols - 1)]
-# 		circle = new THREE.Mesh( circleGeometry, blurMaterial );
-# 		row = Math.floor(i/cols) - rows * .5
-# 		col = i%cols - cols * .5
-# 		circle.position.x = col * spacing 
-# 		circle.position.y = row * spacing 
-# 		groupA.add circle
+			when "color"
+				for circle in groupA.children
+					circle.material = redMaterial
+				for circle in groupB.children
+					circle.material = blueMaterial
 
-# 	for i in [0..(rows * cols - 1)]
-# 		circle = new THREE.Mesh( circleGeometry, blurMaterial );
-# 		row = Math.floor(i/cols) - rows * .5
-# 		col = i%cols - cols * .5
-# 		circle.position.x = col * spacing 
-# 		circle.position.y = row * spacing
-# 		circle.position.z = 1;
-# 		groupB.add circle
+			when "blur"
+				for circle in groupA.children
+					circle.material = blurMaterial
+				for circle in groupB.children
+					circle.material = blurMaterial
 
-	
+		groupA.rotation.z = sliderA * .25;
+		scale = (.01 + sliderA * .005) * sliderZoom
+		groupA.scale.set(scale, scale, scale)
+		groupA.position.set(sliderZoom * .1, sliderZoom * .1, 0)
 
-# 	world.update = ()->
-# 		sliderA = document.getElementById('morie-demo-slider-A').value / 100.0
-# 		sliderZoom = 1 + (document.getElementById('morie-demo-slider-Zoom').value / 100.0) * 6
-# 		material = document.getElementById('morie-demo-material').value
-# 		switch material
-# 			when "black"
-# 				for circle in groupA.children
-# 					circle.material = blackMaterial
-# 				for circle in groupB.children
-# 					circle.material = blackMaterial
-
-# 			when "color"
-# 				for circle in groupA.children
-# 					circle.material = redMaterial
-# 				for circle in groupB.children
-# 					circle.material = blueMaterial
-
-# 			when "blur"
-# 				for circle in groupA.children
-# 					circle.material = blurMaterial
-# 				for circle in groupB.children
-# 					circle.material = blurMaterial
-
-# 		groupA.rotation.z = sliderA * .25;
-# 		scale = (.01 + sliderA * .005) * sliderZoom
-# 		groupA.scale.set(scale, scale, scale)
-# 		groupA.position.set(sliderZoom * .1, sliderZoom * .1, 0)
-
-# 		scale = .01 * sliderZoom
-# 		groupB.scale.set(scale, scale, scale)
-# 		groupB.position.set(sliderZoom * .1, sliderZoom * .1, 0)
+		scale = .01 * sliderZoom
+		groupB.scale.set(scale, scale, scale)
+		groupB.position.set(sliderZoom * .1, sliderZoom * .1, 0)
 
 
 
-# morie_demo()
 
 
 
@@ -371,8 +298,10 @@ class CanvasLayer
 
 # three_demo()
 
-shaping_demo = ()->
-	world = new World(document.getElementById('shaping-demo')).start()
+
+
+shaping_demo = (el)->
+	world = new World(el).start()
 	
 	##
 	# load texture assets
@@ -573,12 +502,14 @@ shaping_demo = ()->
 
 	circleGeometry = new THREE.CircleGeometry( 1, 32 );				
 	
-	setUpCircleGroup = (group, rows, cols, spacing)->
+	setUpCircleGroup = (group, rows, cols, spacing, scaleX = 1, scaleY = 1)->
 		group.scale.set(.1, .1, .1);
 		for i in [0..(rows * cols - 1)]
 			circle = new THREE.Mesh( circleGeometry, circleMaterial );
 			row = Math.floor(i/cols)
 			col = i%cols
+			circle.scale.x = scaleX
+			circle.scale.y = scaleY
 			circle.position.x = col * spacing - (cols - 1) * spacing * .5
 			circle.position.y = row * spacing - (rows - 1) * spacing * .5
 			group.add circle
@@ -590,6 +521,10 @@ shaping_demo = ()->
 	groupB = new THREE.Object3D()
 	setUpCircleGroup groupB, 4, 4, 1.5
 	baseScene.add groupB
+
+	groupC = new THREE.Object3D()
+	setUpCircleGroup groupC, 4, 4, 1.5, .5, .5
+	baseScene.add groupC
 
 	#set up post process scene
 	processScene = new THREE.Scene()
@@ -607,8 +542,8 @@ shaping_demo = ()->
 		new THREE.MeshBasicMaterial
 			map: baseTexture
 			side: THREE.DoubleSide
-	basePlane.position.set(-.4,-.15,-20)
-	basePlane.scale.set(.25,.25,.25);
+	# basePlane.position.set(-.4,-.15,-20)
+	# basePlane.scale.set(.25,.25,.25);
 	world.scene.add basePlane
 
 	# plane used to show the heightmap
@@ -616,8 +551,8 @@ shaping_demo = ()->
 		new THREE.MeshBasicMaterial
 			map: heightMap
 			side: THREE.DoubleSide
-	heightPlane.position.set(-.1,-.15,-20)
-	heightPlane.scale.set(.25,.25,.25);
+	# heightPlane.position.set(-.1,-.15,-20)
+	# heightPlane.scale.set(.25,.25,.25);
 	world.scene.add heightPlane
 
 	# plane used to show the colormap
@@ -625,15 +560,15 @@ shaping_demo = ()->
 		new THREE.MeshBasicMaterial
 			map: colorMap
 			side: THREE.DoubleSide
-	colorPlane.position.set(.2,-.15,-20)
-	colorPlane.scale.set(.25,.25,.25);
+	# colorPlane.position.set(.2,-.15,-20)
+	# colorPlane.scale.set(.25,.25,.25);
 	world.scene.add colorPlane
 
 	# plane that shows the 3d island
 	islandGeometry = new THREE.PlaneGeometry( 1, 1, 100, 100);
 	islandPlane = new THREE.Mesh( islandGeometry, islandMaterial );
-	islandPlane.scale.set(.5, .5, .5)
-	islandPlane.position.set(.1,.1,0)
+	islandPlane.scale.set(1.5, 1.5, 1.5)
+	islandPlane.position.set(0.0,-.1,0.0)
 	islandPlane.rotation.x = Math.PI * - .65
 	world.scene.add islandPlane
 
@@ -645,8 +580,12 @@ shaping_demo = ()->
 		##
 		# inputs
 
-		sliderA = document.getElementById('shaping-demo-slider-A').value / 100.0
-		groupA.rotation.z = sliderA * .25;
+		sliderA = document.getElementById('shaping-demo-slider-a').value / 100.0
+		groupB.rotation.z = sliderA * .25;
+		groupB.position.x = sliderA * .25;
+
+		groupC.rotation.z = sliderA * -.5;
+		groupC.position.y = sliderA * -.5;
 
 		exponent = document.getElementById('shaping-demo-slider-exponent').value / 100.0
 		shapingMaterial.uniforms[ 'exponent' ].value = exponent;
@@ -663,10 +602,28 @@ shaping_demo = ()->
 		ramp = document.getElementById('shaping-demo-slider-ramp').value / 100.0
 		coloringMaterial.uniforms[ 'rampLevel' ].value = ramp;
 
+
+
+		basePlane.visible = heightPlane.visible = colorPlane.visible = islandPlane.visible = false
+		show = document.getElementById('shaping-demo-show').value
+		switch show
+			when "base"
+				basePlane.visible = true
+
+			when "shaped"
+				heightPlane.visible = true
+
+			when "colored"
+				colorPlane.visible = true
+
+			when "island"
+				islandPlane.visible = true
+
 		##
 		# animation
 
-		islandPlane.rotation.z += .01;
+		islandPlane.rotation.z += .0025;
+
 
 		##
 		# render sequence
@@ -685,101 +642,82 @@ shaping_demo = ()->
 
 
 
-shaping_demo();
 
 
 
 
+#boiler plate
 
+class World
 
+	update: false
 
-		# exponent = document.getElementById('shaping-demo-slider-exponent').value / 100.0
-		# effect.uniforms[ 'exponent' ].value = exponent;
-
-		# min = document.getElementById('shaping-demo-slider-min').value / 100.0
-		# effect.uniforms[ 'thresholdMin' ].value = min;
-
-		# max = document.getElementById('shaping-demo-slider-max').value / 100.0
-		# effect.uniforms[ 'thresholdMax' ].value = max;
-
-		# mod = document.getElementById('shaping-demo-slider-mod').value / 100.0
-		# effect.uniforms[ 'modLevel' ].value = mod;
-
-		# ramp = document.getElementById('shaping-demo-slider-ramp').value / 100.0
-		# effect.uniforms[ 'rampLevel' ].value = ramp;
-
+	constructor: (@element)->
+		@width  = 512; #@element.clientWidth
+		@height = 256; #@element.clientHeight
+		@aspect = @width / @height 
 		
-		# plane.rotation.z += .01;
-		# composer.render()
+		@scene = new THREE.Scene()
+
+		@camera = new THREE.OrthographicCamera(-.5, .5, -.5 / @aspect  , .5 / @aspect , 0, 1000)
+		@camera.position.z = 5
+		@scene.add @camera
+
+		@renderer = new THREE.WebGLRenderer()
+		@renderer.setClearColor 0xFFFFFF, 1
+		@renderer.setSize @width, @height
+		@element.appendChild @renderer.domElement
+		
 
 
-
-	# ExponentShader = 
-	# 	uniforms: 
-	# 		"tDiffuse": { type: "t", value: null }
-	# 		"ramp": { type: "t", value: null }
-	# 		"exponent": { type:"f", value: 1.0 }
-	# 		"thresholdMin": { type:"f", value: 0.0 }
-	# 		"thresholdMax": { type:"f", value: 1.0 }
-	# 		"modLevel": { type:"f", value: 1.01 }
-	# 		"rampLevel": { type:"f", value: 1.01 }
-
-	# 	vertexShader:
-	# 		"""
-	# 		varying vec2 vUv;
-	# 		void main() {
-	# 			vUv = uv;
-	# 			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-	# 		}
-	# 		"""
-
-	# 	fragmentShader:
-	# 		"""
-	# 		uniform sampler2D tDiffuse;
-	# 		uniform sampler2D ramp;
-	# 		uniform float exponent;
-	# 		uniform float thresholdMin;
-	# 		uniform float thresholdMax;
-	# 		uniform float modLevel;
-	# 		uniform float rampLevel;
-
-	# 		varying vec2 vUv;
-
-	# 		void main() {
-	# 			vec4 texel = texture2D( tDiffuse, vUv );
-	# 			vec4 o = pow( clamp(texel, 0.0 , 1.0), vec4(exponent, exponent, exponent, exponent) );
- #  				o = mod( o, vec4(modLevel, modLevel, modLevel, modLevel)) / modLevel;
- #  				//o = sin( o * vec4(3.14159 * rings, 3.14159 * rings, 3.14159 * rings, 3.14159 * rings)) * .5 + .5;
-				
- #  				//make anything under thresholdMin 0.0
-	# 			o = step(vec4(thresholdMin, thresholdMin, thresholdMin, thresholdMin), o) * o;
-	# 			o += vec4(.1, .1, .1, .1);
-
-	# 			// make anything over threshold max 1.0
-	# 			o = o + step(  vec4(thresholdMax, thresholdMax, thresholdMax, thresholdMax), o );
- #  				o = min( vec4(1.0, 1.0, 1.0, 1.0), o );
-				
-
-				
-
- #  				// use the color lookup table to colorize the result
-	# 			o = texture2D( ramp, vec2(o.r, .95 - rampLevel));
-
-	# 			o = clamp(o, 0.0 , 1.0);
-	# 			o.a = 1.0;
-				
-	# 			gl_FragColor = o;
-	# 		}
-	# 		"""
-
-	# composer = new THREE.EffectComposer( world.renderer, rtTexture );
-	# composer.addPass( new THREE.RenderPass( world.scene, world.camera ) );
-
-	# effect = new THREE.ShaderPass( ExponentShader );
-	# effect.uniforms['ramp'].value = colorRamp
-	# # effect.renderToScreen = true
-	# composer.addPass( effect )
-	# world.composer = composer
+	_render_loop: ()->
+		requestAnimationFrame ()=> @_render_loop()
+		@update?()
+		@renderer.render @scene, @camera
 
 
+	start: ()->
+		@_render_loop()
+		this
 
+class CanvasLayer
+	constructor: (@world)->
+
+		canvas = document.createElement 'canvas' 
+		canvas.width = 512
+		canvas.height = 256
+
+
+		@_canvasTexture = new THREE.Texture(canvas) 
+		@_canvasTexture.needsUpdate = true
+
+
+		canvasMaterial = new THREE.MeshBasicMaterial
+			map: @_canvasTexture
+
+		planeGeometry = new THREE.PlaneGeometry 1, 1 / @world.aspect 
+		mesh = new THREE.Mesh planeGeometry, canvasMaterial 
+		mesh.rotation.x = Math.PI
+		@world.scene.add mesh
+
+		@context = canvas.getContext '2d'
+
+	update: ()->
+		@_canvasTexture.needsUpdate = true;
+
+	blank: (color)->
+		@context.beginPath();
+		@context.rect(0, 0, 512, 512);
+		@context.fillStyle = color;
+		@context.fill();
+
+
+jQuery ->
+	$('#shaping-demo').each (i, el)->
+		shaping_demo this
+
+	$('#additive-demo').each (i, el)->
+		additive_demo this
+
+	$('#morie-demo').each (i, el)->
+		morie_demo this

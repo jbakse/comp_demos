@@ -2,63 +2,164 @@
 <head>
 	<title>My first Three.js app</title>
 	<style>
-	body {margin: 0;} 
-	canvas { width: 100%; height: 100%; margin: 0; }
-	.demo { width: 512px; height: 256px; border: 1px solid gray; margin: 1em auto;}
-	.demo-controls { width: 512px; margin: 1em auto; }
+	body { 
+		margin: 0 1em;
+		font-family: "Futura", sans;
+		font-weight: 100;
+		font-size: 18px;
+		line-height: 1.5;
+		background-color: #F0F0F0;
+		color: black;
+	} 
+	
+	h1 {
+		font-size: 3em;
+	}
+
+	h2 {
+		font-size: 2em;
+	}
+
+	section {
+		margin-bottom: 6em;
+	}
+
+	main {
+		max-width: 780px;
+		margin: 0 auto;
+	}
+
+	.demo
+	{ 
+/*		width: 512px;
+		height: 256px;*/
+		border: 10px solid #BBB;
+		margin: 1em 0;
+	}
+
+	.demo canvas
+	{
+		width: 100%;
+		height: auto;
+	}
+
+	.demo-controls
+	{ 
+		margin: 1em 0;
+		/*background-color: #FFF;*/
+		/*padding: 1em 1em 0 1em;*/
+	}
+
+	.demo-controls label
+	{
+		display: inline-block;
+		font-size: .8em;
+		width: 30%;
+		margin-right: 2%;
+		margin-bottom: 1em;
+	}
+
+	.demo-controls label input,
+	.demo-controls label select
+	{
+		display: block;
+		width: 100%;
+		margin-top: 5px;
+	}
+
 	</style>
 
 	<script src="lib/jquery-2.1.0.min.js"></script>
 	<script src="lib/coffee-script.js"></script>
 	<script src="lib/three/three.min.js"></script>
 	
+	<!--
 	<script src="lib/three/shaders/CopyShader.js"></script>
 	<script src="lib/three/postprocessing/EffectComposer.js"></script>
 	<script src="lib/three/postprocessing/RenderPass.js"></script>
 	<script src="lib/three/postprocessing/MaskPass.js"></script>
 	<script src="lib/three/postprocessing/ShaderPass.js"></script>
-
+	-->
 
 	<script src="lib/SimplexNoise.js"></script>
 
 
 </head>
-<body>
-	<div id="three-demo" class="demo"></div>
 
-	<h2>Shaping</h2>
-	<div id="shaping-demo" class="demo"></div>
-	<div class = "demo-controls">
-		A <input id="shaping-demo-slider-A" type="range" min="2" max="100" value="20">
-		Exponent <input id="shaping-demo-slider-exponent" type="range" min="1" max="500" value="100">
-		Min<input id="shaping-demo-slider-min" type="range" min="0" max="100" value="0">
-		Max<input id="shaping-demo-slider-max" type="range" min="0" max="100" value="100">
-		Mod<input id="shaping-demo-slider-mod" type="range" min="0" max="101" value="101">
-		Ramp<input id="shaping-demo-slider-ramp" type="range" min="0" max="100" value="0">
-	</div>
+<body>
+	<main>
+	<h1>Computational Form</h1>
+
+	<section id = "additive">
+		<h2>Additive Synthesis</h2>
+		
+		<div id="additive-demo" class="demo"></div>
+		<div class = "demo-controls">
+			<label for="sin-demo-slider-a">A <input id="sin-demo-slider-a" type="range" min="2" max="100" value="20"></a></label>
+			<label for="sin-demo-slider-b">B <input id="sin-demo-slider-b" type="range" min="2" max="100" value="27"></a></label>
+			<label for="sin-demo-slider-c">C <input id="sin-demo-slider-c" type="range" min="2" max="100" value="51"></a></label>
+		</div>
+
+		<p>
+			Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Typi non habent claritatem insitam; est usus legentis in iis qui facit eorum claritatem. Investigationes demonstraverunt lectores legere me lius quod ii legunt saepius.
+		</p>
+
+	</section>
+
+	<section id = "morie">
+		<h2>Morié Patterns</h2>
+		<div id="morie-demo" class="demo"></div>
+		<div class = "demo-controls">
+			<label for="morie-demo-slider-a">A <input id="morie-demo-slider-A" type="range" min="0" max="100" value="100"></label>
+			<label for="morie-demo-slider-zoom">Zoom <input id="morie-demo-slider-Zoom" type="range" min="0" max="100" value="50"></label>
+			<label for="morie-demo-material">Material 
+				<select id="morie-demo-material">
+					<option value="black">black</option> 
+					<option value="color">color</option> 
+					<option value="blur">blur</option> 
+				</select>
+			</label>
+		</div>
+
+		<p>
+			Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Typi non habent claritatem insitam; est usus legentis in iis qui facit eorum claritatem. Investigationes demonstraverunt lectores legere me lius quod ii legunt saepius.
+		</p>
+
+	</section>
+
+	<section id = "shaping">
+		<h2>Shaping</h2>
+
+		<div id="shaping-demo" class="demo"></div>
+		<div class = "demo-controls">
+			<label for="shaping-demo-slider-a">A <input id="shaping-demo-slider-a" type="range" min="2" max="100" value="20"> </label>
+			<label for="shaping-demo-slider-exponent">Exponent <input id="shaping-demo-slider-exponent" type="range" min="1" max="500" value="100"> </label>
+			<label for="shaping-demo-slider-min">Min <input id="shaping-demo-slider-min" type="range" min="0" max="100" value="0"> </label>
+			<label for="shaping-demo-slider-max">Max <input id="shaping-demo-slider-max" type="range" min="0" max="100" value="100"> </label>
+			<label for="shaping-demo-slider-mod">Mod <input id="shaping-demo-slider-mod" type="range" min="0" max="101" value="101"> </label>
+			<label for="shaping-demo-slider-ramp">Ramp <input id="shaping-demo-slider-ramp" type="range" min="0" max="100" value="0"> </label>
+			<label for="shaping-demo-show">Material 
+				<select id="shaping-demo-show">
+					<option value="base">base</option> 
+					<option value="shaped">shaped</option> 
+					<option value="colored">colored</option> 
+					<option value="island">island</option> 
+				</select>
+			</label>
+
+		</div>
+
+		<p>
+			Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Typi non habent claritatem insitam; est usus legentis in iis qui facit eorum claritatem. Investigationes demonstraverunt lectores legere me lius quod ii legunt saepius.
+		</p>
+	</section>
+
 <!--
 
 	
-	<h2>Additive Synthesis</h2>
-	<div id="sin-demo" class="demo"></div>
-	<div class = "demo-controls">
-		A <input id="sin-demo-slider-A" type="range" min="2" max="100" value="20">
-		B <input id="sin-demo-slider-B" type="range" min="2" max="100" value="27">
-		C <input id="sin-demo-slider-C" type="range" min="2" max="100" value="51">
-	</div>
+	
 
-	<h2>Morie Patterns</h2>
-	<div id="morie-demo" class="demo"></div>
-	<div class = "demo-controls">
-		A <input id="morie-demo-slider-A" type="range" min="0" max="100" value="100">
-		Zoom <input id="morie-demo-slider-Zoom" type="range" min="0" max="100" value="50">
-		Material 
-		<select id="morie-demo-material">
-			<option value="black">black</option> 
-			<option value="color">color</option> 
-			<option value="blur">blur</option> 
-		</select>
-	</div>
+	
 
 	<h2>Perlin/Simplex Noise</h2>
 	<div id="noise-demo" class="demo"></div>
@@ -67,14 +168,11 @@
 		Falloff <input id="noise-demo-slider-falloff" type="range" min="0" max="100" value="100">
 	</div>-->
 
-	Shaping
-		Threshold/Levels/Loop (find rings)
-		Exponent in range0-1 to "punk and bloat"
-
-	Color Ramp
+	
 
 
 	<script type="text/coffeescript" src="scripts/demo.coffee"></script>
+	</main>
 </body>
 
 <script>
