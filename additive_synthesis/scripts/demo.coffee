@@ -373,11 +373,18 @@ shaping_demo = (el)->
 		fragmentShader:
 			"""
 			uniform sampler2D colorMap;
+			uniform sampler2D heightMap;
 			varying vec2 vUv;
 
 			void main() {
 				vec4 texel = texture2D( colorMap, vUv );
 				texel.a = 1.0;
+
+				//expiremental lighting
+				vec4 here = texture2D( heightMap, vec2(vUv.x, vUv.y) );
+				vec4 up = texture2D( heightMap, vec2(vUv.x, vUv.y-.01) );
+				texel.rgb += (here.rgb - up.rgb) * 2.0;
+
 				gl_FragColor = texel;
 			}
 			"""
