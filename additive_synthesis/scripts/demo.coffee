@@ -46,9 +46,17 @@ setup_demo = (element)->
 
 
 
-additive_demo = (el)->
-	world = new World(el).start()
-	layer = new CanvasLayer world
+additive_demo = (element)->
+	# create a canvas and add it to the target element
+	canvas = document.createElement 'canvas'
+	canvas.width = 512
+	canvas.height = 256
+	$(element).append canvas
+
+	# grab and store the 2d context of the canvas, this is where we do our drawing
+	c = canvas.getContext '2d'
+
+
 
 	plot = (context, start, end, f)->
 		context.beginPath();
@@ -63,11 +71,15 @@ additive_demo = (el)->
 		sliderB = document.getElementById('sin-demo-slider-b').value
 		sliderC = document.getElementById('sin-demo-slider-c').value
 
-		c = layer.context
-
+		# save all the attributes of the context so we can restore them when we are done
+		# this lets us do things like change the drawing color without worrying about putting everything back when we are done
 		c.save()
+		
+		c.fillStyle = 'white'
+		c.fillRect 0, 0, 512, 256
 
-		c.strokeStyle = 'white'
+
+		c.strokeStyle = 'gray'
 		c.translate 0, 32
 		plot c, 0, 512, (x)->
 			Math.sin(x/512 * Math.PI * sliderA) * 18
@@ -88,13 +100,12 @@ additive_demo = (el)->
 			 Math.sin(x/512 * Math.PI * sliderB) * 12 + 
 			 Math.sin(x/512 * Math.PI * sliderC) * 8
 
+
+		# restore the context attributes
 		c.restore()
 
+	setInterval drawWaves, 30
 
-	world.update = ()->
-		layer.blank 'black'
-		drawWaves()
-		layer.update()
 
 
 
