@@ -22,10 +22,27 @@
 
 	section {
 		margin-bottom: 6em;
+		vertical-align: top;
+		
+	}
+
+	.copy
+	{
+		width: 512px;
+		display: inline-block;
+		vertical-align: top;
+	}
+
+	.code
+	{
+		width: 512px;
+		display: inline-block;
+		vertical-align: top;
+
 	}
 
 	main {
-		max-width: 780px;
+		/*max-width: 512px;*/
 		margin: 0 auto;
 	}
 
@@ -33,6 +50,7 @@
 	{ 
 		border: 10px solid #BBB;
 		margin: 1em 0;
+		
 	}
 
 	.demo canvas
@@ -89,6 +107,18 @@
 		text-decoration: none;
 		border-bottom: 1px solid black;
 	}
+
+
+	
+
+    .ace_editor {
+        position: relative !important;
+        /*border: 1px solid lightgray;*/
+       
+        height: 300px;
+        /*height: 200px;*/
+        /*width: 80%;*/
+    }
 	</style>
 
 	<script src="lib/jquery-2.1.0.min.js"></script>
@@ -104,24 +134,61 @@
 
 
 	<section id = "setup">
-		<h2>On an Empty Field, a Single Blue Dot</h2>
-		
-		<div id="setup-demo" class="demo"></div>
+		<div class = "copy">
+			<h2>On an Empty Field, a Single Blue Dot</h2>
+			
+			<div id="setup-demo" class="demo"></div>
 
-		<p>
-			Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Typi non habent claritatem insitam; est usus legentis in iis qui facit eorum claritatem. Investigationes demonstraverunt lectores legere me lius quod ii legunt saepius.
-		</p>
+			<p>
+				Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Typi non habent claritatem insitam; est usus legentis in iis qui facit eorum claritatem. Investigationes demonstraverunt lectores legere me lius quod ii legunt saepius.
+			</p>
 
-		<div class = "meta">
-			Related:
-			<ul class="related-links">
-				<li><a href="http://http://threejs.org/">three.js</a></li>
-				<li><a href="https://developer.mozilla.org/en-US/docs/HTML/Canvas">HTML Canvas API</a></li>
-				<li><a href="https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Canvas_tutorial">Mozilla Canvas Tutorial</a></li>
-				<li><a href="http://coffeescript.org/">CoffeeScript</a></li>
-			</ul>
+			<div class = "meta">
+				Related:
+				<ul class="related-links">
+					<li><a href="http://http://threejs.org/">three.js</a></li>
+					<li><a href="https://developer.mozilla.org/en-US/docs/HTML/Canvas">HTML Canvas API</a></li>
+					<li><a href="https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Canvas_tutorial">Mozilla Canvas Tutorial</a></li>
+					<li><a href="http://coffeescript.org/">CoffeeScript</a></li>
+				</ul>
+			</div>
 		</div>
+		<div id="editor" class="code">
+setup_demo = (element)->
+	width  = 512; 
+	height = 256; 
+	aspect = width / height 
 
+	# create a 3D render using three.js
+	renderer = new THREE.WebGLRenderer()
+	renderer.setClearColor 0xFFFFFF, 1
+	renderer.setSize width, height
+	element.appendChild renderer.domElement
+
+	# create the scene
+	scene = new THREE.Scene()
+
+	# add a camera to the scene
+	camera = new THREE.OrthographicCamera(-.5, .5, -.5 / aspect  , .5 / aspect , 0, 1000)
+	camera.position.z = 5
+	scene.add camera
+
+	# create a material that will be when the circle is drawn
+	blueMaterial = new THREE.MeshBasicMaterial
+		color: 0x0000FF
+		side: THREE.DoubleSide
+
+	# create the circle geometry
+	circleGeometry = new THREE.CircleGeometry( .1, 32 );
+
+	# create the circle				
+	circle = new THREE.Mesh( circleGeometry, blueMaterial );
+	scene.add circle
+
+
+
+	renderer.render scene, camera
+		</div>
 	</section>
 
 
@@ -217,6 +284,16 @@
 
 
 	<script type="text/coffeescript" src="scripts/demo.coffee"></script>
+
+	<script src="src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+	<script>
+		var editor = ace.edit("editor");
+		editor.setTheme("ace/theme/github");
+		editor.getSession().setMode("ace/mode/coffee");
+	</script>
+
+
+
 	</main>
 </body>
 
