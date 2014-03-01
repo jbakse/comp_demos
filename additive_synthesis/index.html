@@ -1,195 +1,33 @@
 <html>
 <head>
 	<title>Computational Form</title>
-	<style>
-	body { 
-		margin: 0 1em;
-		font-family: "Futura", sans;
-		font-weight: 100;
-		font-size: 18px;
-		line-height: 1.5;
-		background-color: #F0F0F0;
-		color: black;
-	} 
-	
-	h1 {
-		font-size: 3em;
-	}
 
-	h2 {
-		font-size: 2em;
-	}
-
-	section {
-		margin-bottom: 6em;
-		vertical-align: top;
-		
-	}
-
-	.copy
-	{
-		width: 512px;
-		display: inline-block;
-		vertical-align: top;
-	}
-
-	.code
-	{
-		width: 512px;
-		display: inline-block;
-		vertical-align: top;
-
-	}
-
-	main {
-		/*max-width: 512px;*/
-		margin: 0 auto;
-	}
-
-	.demo
-	{ 
-		border: 10px solid #BBB;
-		margin: 1em 0;
-		
-	}
-
-	.demo canvas
-	{
-		width: 100%;
-		height: auto;
-	}
-
-	.demo-controls
-	{ 
-		margin: 1em 0;
-		/*background-color: #FFF;*/
-		/*padding: 1em 1em 0 1em;*/
-	}
-
-	.demo-controls label
-	{
-		display: inline-block;
-		font-size: .8em;
-		width: 30%;
-		margin-right: 2%;
-		margin-bottom: 1em;
-	}
-
-	.demo-controls label input,
-	.demo-controls label select
-	{
-		display: block;
-		width: 100%;
-		margin-top: 5px;
-	}
-
-	.related-links
-	{
-		margin: 0;
-		padding: 0;
-	}
-
-
-	.meta
-	{
-		font-size: .8em;
-	}
-
-	.related-links li
-	{
-		display: inline;
-		
-	}
-
-	a 
-	{
-		color: black;
-		text-decoration: none;
-		border-bottom: 1px solid black;
-	}
-
-
-	
-
-    .ace_editor {
-        position: relative !important;
-        /*border: 1px solid lightgray;*/
-       
-        height: 300px;
-        /*height: 200px;*/
-        /*width: 80%;*/
-    }
-	</style>
 
 	<script src="lib/jquery-2.1.0.min.js"></script>
 	<script src="lib/coffee-script.js"></script>
 	<script src="lib/three/three.min.js"></script>
 	
+	<link type="text/css" rel = "stylesheet" href="styles/style.css">
 
 </head>
 
 <body>
 	<main>
-	<h1>Computational Form</h1>
+	<h1>Generating Form</h1>
 
+	<blockquote cite="http://markwunsch.com/blog/2008/09/27/design-q-a-with-charles-eames.html">
+	  Q: Can the computer substitute for the Designer? <br/>
+	  A: Probably, in some special cases, but usually the computer is an aid to the Designer.
+	  <cite>— Charles Eames, Design Q&amp;A</cite>
+	</blockquote>
+	
 
-	<section id = "setup">
-		<div class = "copy">
-			<h2>On an Empty Field, a Single Blue Dot</h2>
-			
-			<div id="setup-demo" class="demo"></div>
-
-			<p>
-				Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Typi non habent claritatem insitam; est usus legentis in iis qui facit eorum claritatem. Investigationes demonstraverunt lectores legere me lius quod ii legunt saepius.
-			</p>
-
-			<div class = "meta">
-				Related:
-				<ul class="related-links">
-					<li><a href="http://http://threejs.org/">three.js</a></li>
-					<li><a href="https://developer.mozilla.org/en-US/docs/HTML/Canvas">HTML Canvas API</a></li>
-					<li><a href="https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Canvas_tutorial">Mozilla Canvas Tutorial</a></li>
-					<li><a href="http://coffeescript.org/">CoffeeScript</a></li>
-				</ul>
-			</div>
-		</div>
-		<div id="editor" class="code">
-setup_demo = (element)->
-	width  = 512; 
-	height = 256; 
-	aspect = width / height 
-
-	# create a 3D render using three.js
-	renderer = new THREE.WebGLRenderer()
-	renderer.setClearColor 0xFFFFFF, 1
-	renderer.setSize width, height
-	element.appendChild renderer.domElement
-
-	# create the scene
-	scene = new THREE.Scene()
-
-	# add a camera to the scene
-	camera = new THREE.OrthographicCamera(-.5, .5, -.5 / aspect  , .5 / aspect , 0, 1000)
-	camera.position.z = 5
-	scene.add camera
-
-	# create a material that will be when the circle is drawn
-	blueMaterial = new THREE.MeshBasicMaterial
-		color: 0x0000FF
-		side: THREE.DoubleSide
-
-	# create the circle geometry
-	circleGeometry = new THREE.CircleGeometry( .1, 32 );
-
-	# create the circle				
-	circle = new THREE.Mesh( circleGeometry, blueMaterial );
-	scene.add circle
-
-
-
-	renderer.render scene, camera
-		</div>
-	</section>
+	<p>
+		Computer programming is a powerful tool for creating and manipulating form. Software sound synthesizers have been used since the 1970's. Digital photo processing has all but completely replaced traditional photo retouching. Entire film sets are routinely created digitally. Generative 3D models can be fabricated with consumer 3D printers. In most cases, when a computer is used to create form, general purpose applications are used to combine and manipulate scanned images, recorded sounds, manually created 3D models, and other assets. 
+	</p>
+	<p>
+		It is also possible to create form entirely from code. There are countless techniques in generative art, some of the most well known include: fractals, <a href="http://recursivedrawing.com/">recursion</a>, l-systems, Markov-chains, cellular automata, and Perlin noise. In this presentation I will show one way to create a <b>complex</b>, <b>controlled</b>, and <b>deterministic</b> form almost entirely from code.
+	</p>
 
 
 	<section id = "additive">
@@ -197,16 +35,45 @@ setup_demo = (element)->
 		
 		<div id="additive-demo" class="demo"></div>
 		<div class = "demo-controls">
-			<label for="sin-demo-slider-a">A <input id="sin-demo-slider-a" type="range" min="2" max="100" value="20"></a></label>
-			<label for="sin-demo-slider-b">B <input id="sin-demo-slider-b" type="range" min="2" max="100" value="27"></a></label>
-			<label for="sin-demo-slider-c">C <input id="sin-demo-slider-c" type="range" min="2" max="100" value="51"></a></label>
+			<label for="additive-demo-slider-a">A <input id="additive-demo-slider-a" type="range" min="2" max="100" value="20"></a></label>
+			<label for="additive-demo-slider-b">B <input id="additive-demo-slider-b" type="range" min="2" max="100" value="27"></a></label>
+			<label for="additive-demo-slider-c">C <input id="additive-demo-slider-c" type="range" min="2" max="100" value="51"></a></label>
 		</div>
+
+		<p>
+			Additive Synthesis is commonly used in audio applications. Complex, periodic signals are created by summing simple sine and cosine waves. If you add enough waves together, any arbitrary periodic signal can be <a href="http://en.wikipedia.org/wiki/Fourier_series">closely reproduced</a>. The example above shows three sine waves of different periods and amplitudes in gray and their sum in red. Notice that though the sine waves repeat several times each, the sum wave does not repeat within the view. The sum wave does eventually repeat; its period will be the least common multiple of the periods of the sine waves.
+		</p>
+		
+		<script type="text/coffeescript" src="scripts/additive.coffee"></script>
+
+	</section>
+
+
+	<!-- <section id = "setup">
+		
+		<h2>On an Empty Field, a Single Blue Dot</h2>
+		
+		<div id="setup-demo" class="demo"></div>
 
 		<p>
 			Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Typi non habent claritatem insitam; est usus legentis in iis qui facit eorum claritatem. Investigationes demonstraverunt lectores legere me lius quod ii legunt saepius.
 		</p>
 
+		<div class = "meta">
+			Related:
+			<ul class="related-links">
+				<li><a href="http://http://threejs.org/">three.js</a></li>
+				<li><a href="https://developer.mozilla.org/en-US/docs/HTML/Canvas">HTML Canvas API</a></li>
+				<li><a href="https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Canvas_tutorial">Mozilla Canvas Tutorial</a></li>
+				<li><a href="http://coffeescript.org/">CoffeeScript</a></li>
+			</ul>
+		</div>
+		
+		
 	</section>
+
+
+	
 
 	<section id = "morie">
 		<h2>Morié Patterns</h2>
@@ -264,7 +131,7 @@ setup_demo = (element)->
 		<p>
 			Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Typi non habent claritatem insitam; est usus legentis in iis qui facit eorum claritatem. Investigationes demonstraverunt lectores legere me lius quod ii legunt saepius.
 		</p>
-	</section>
+	</section> -->
 
 <!--
 
@@ -283,14 +150,9 @@ setup_demo = (element)->
 	
 
 
-	<script type="text/coffeescript" src="scripts/demo.coffee"></script>
 
-	<script src="src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
-	<script>
-		var editor = ace.edit("editor");
-		editor.setTheme("ace/theme/github");
-		editor.getSession().setMode("ace/mode/coffee");
-	</script>
+
+
 
 
 

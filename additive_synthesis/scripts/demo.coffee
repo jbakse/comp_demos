@@ -46,65 +46,7 @@ setup_demo = (element)->
 
 
 
-additive_demo = (element)->
-	# create a canvas and add it to the target element
-	canvas = document.createElement 'canvas'
-	canvas.width = 512
-	canvas.height = 256
-	$(element).append canvas
 
-	# grab and store the 2d context of the canvas, this is where we do our drawing
-	c = canvas.getContext '2d'
-
-
-
-	plot = (context, start, end, f)->
-		context.beginPath();
-		context.moveTo 0, 0
-		for x in [start..end]
-			context.lineTo x, f(x) 
-		context.stroke()
-
-
-	drawWaves = ()->
-		sliderA = document.getElementById('sin-demo-slider-a').value
-		sliderB = document.getElementById('sin-demo-slider-b').value
-		sliderC = document.getElementById('sin-demo-slider-c').value
-
-		# save all the attributes of the context so we can restore them when we are done
-		# this lets us do things like change the drawing color without worrying about putting everything back when we are done
-		c.save()
-		
-		c.fillStyle = 'white'
-		c.fillRect 0, 0, 512, 256
-
-
-		c.strokeStyle = 'gray'
-		c.translate 0, 32
-		plot c, 0, 512, (x)->
-			Math.sin(x/512 * Math.PI * sliderA) * 18
-
-		c.translate 0, 58
-		plot c, 0, 512, (x)->
-			Math.sin(x/512 * Math.PI * sliderB) * 12
-
-		c.translate 0, 50
-		plot c, 0, 512, (x)->
-			Math.sin(x/512 * Math.PI * sliderC) * 8
-
-
-		c.strokeStyle = 'red'
-		c.translate 0, 64
-		plot c, 0, 512, (x)->
-			 Math.sin(x/512 * Math.PI * sliderA) * 18 + 
-			 Math.sin(x/512 * Math.PI * sliderB) * 12 + 
-			 Math.sin(x/512 * Math.PI * sliderC) * 8
-
-
-		# restore the context attributes
-		c.restore()
-
-	setInterval drawWaves, 30
 
 
 
@@ -648,8 +590,7 @@ jQuery ->
 	$('#setup-demo').each (e)->
 		setup_demo this
 
-	$('#additive-demo').each (e)->
-		additive_demo this
+	
 
 	$('#morie-demo').each (e)->
 		morie_demo this
