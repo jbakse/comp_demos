@@ -21,41 +21,47 @@ additive_demo = (element)->
 
 	# reads the values of the sliders and calls plot to draw three sine waves and a sum of the waves
 	drawWaves = ()->
-		sliderA = $('#additive-demo-slider-a')[0].value
-		sliderB = $('#additive-demo-slider-b')[0].value
-		sliderC = $('#additive-demo-slider-c')[0].value
+		sliderA = $('#additive-demo-slider-a').val()
+		sliderB = $('#additive-demo-slider-b').val()
+		sliderC = $('#additive-demo-slider-c').val()
 
-		# save all the attributes of the context so we can restore them when we are done
-		# this lets us do things like change the drawing color and position without worrying about putting everything back when we are done
-		c.save()
+		
 		
 		# clear the canvas
+		c.save()
 		c.fillStyle = 'white'
 		c.fillRect 0, 0, 768, 384
+		c.restore()
 
-		#draw the waves
+		##
+		# draw the waves
+		c.save()
 		c.strokeStyle = 'gray'
+
 		c.translate 0, 60
-		plot c, 0, 768, (x)->
-			Math.sin(x/768 * Math.PI * sliderA) * 24
+		plot c, 0, 768,
+			(x)->
+				Math.sin(x/768 * Math.PI * sliderA) * 24
 
 		c.translate 0, 80
-		plot c, 0, 768, (x)->
-			Math.sin(x/768 * Math.PI * sliderB) * 18
+		plot c, 0, 768,
+			(x)->
+				Math.sin(x/768 * Math.PI * sliderB) * 18
 
 		c.translate 0, 80
-		plot c, 0, 768, (x)->
-			Math.sin(x/768 * Math.PI * sliderC) * 12
+		plot c, 0, 768,
+			(x)->
+				Math.sin(x/768 * Math.PI * sliderC) * 12
 
 		c.strokeStyle = 'red'
+		
 		c.translate 0, 80
-		plot c, 0, 768, (x)->
-			 Math.sin(x/768 * Math.PI * sliderA) * 24 + 
-			 Math.sin(x/768 * Math.PI * sliderB) * 18 + 
-			 Math.sin(x/768 * Math.PI * sliderC) * 12
+		plot c, 0, 768,
+			(x)->
+				Math.sin(x/768 * Math.PI * sliderA) * 24 + 
+				Math.sin(x/768 * Math.PI * sliderB) * 18 + 
+				Math.sin(x/768 * Math.PI * sliderC) * 12
 
-
-		# restore the context attributes
 		c.restore()
 
 	#draw the waves once now, and again when the sliders' values change

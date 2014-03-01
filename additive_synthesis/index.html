@@ -28,25 +28,125 @@
 	<p>
 		It is also possible to create form entirely from code. There are countless techniques in generative art, some of the most well known include: fractals, <a href="http://recursivedrawing.com/">recursion</a>, l-systems, Markov-chains, cellular automata, and Perlin noise. In this presentation I will show one way to create a <b>complex</b>, <b>controlled</b>, and <b>deterministic</b> form almost entirely from code.
 	</p>
-
-
+	
 	<section id = "additive">
 		<h2>Additive Synthesis: Combining Simple Patterns Gives Rise to Complex Patterns</h2>
 		
-		<div id="additive-demo" class="demo"></div>
+		<div id="additive-demo" class="demo"><img src="images/2x1.png" /></div>
 		<div class = "demo-controls">
 			<label for="additive-demo-slider-a">A <input id="additive-demo-slider-a" type="range" min="2" max="100" value="20"></a></label>
 			<label for="additive-demo-slider-b">B <input id="additive-demo-slider-b" type="range" min="2" max="100" value="27"></a></label>
 			<label for="additive-demo-slider-c">C <input id="additive-demo-slider-c" type="range" min="2" max="100" value="51"></a></label>
 		</div>
+		<p>
+			Computers are digital, within a computer <b>everything</b> is represented by numbers. When you scan an image, the scanner creates a sequence of numbers that describe the image. This works backwards as well, you can generate a sequence of numbers and display it as an image. Sequences of numbers can represent just about anything: the audio samples in a sound, the location of vertices in a 3D model, events that happen in a game. To create form with a program we need to generate interesting sequences of numbers.
+		</p>
 
 		<p>
-			Additive Synthesis is commonly used in audio applications. Complex, periodic signals are created by summing simple sine and cosine waves. If you add enough waves together, any arbitrary periodic signal can be <a href="http://en.wikipedia.org/wiki/Fourier_series">closely reproduced</a>. The example above shows three sine waves of different periods and amplitudes in gray and their sum in red. Notice that though the sine waves repeat several times each, the sum wave does not repeat within the view. The sum wave does eventually repeat; its period will be the least common multiple of the periods of the sine waves.
+			Additive Synthesis is common way to generate numbers in audio applications. Complex, periodic signals can be created by summing simple signals like sine and cosine waves. If you add enough sine waves together, any arbitrary periodic signal can be <a href="http://en.wikipedia.org/wiki/Fourier_series">closely reproduced</a>. The example above shows three sine waves of different periods and amplitudes in gray and their sum in red. Notice that though the sine waves repeat frequently, the sum wave does not repeat within the view. The sum wave does eventually repeat; its period will be the least common multiple of the periods of the sine waves.
 		</p>
-		
+
 		<script type="text/coffeescript" src="scripts/additive.coffee"></script>
 
 	</section>
+
+	<section id = "shaping">
+		<h2>Shaping: Bend The Numbers to Your Will</h2>
+		
+		<div id="shaping-demo" class="demo"><img src="images/2x1.png" /></div>
+		<div class = "demo-controls">
+			<label for="shaping-demo-slider-preamp">Pre-Gain <input id="shaping-demo-slider-preamp" type="range" min="0" max="200" value="100"></a></label>
+			<label for="shaping-demo-slider-bias">Bias <input id="shaping-demo-slider-bias" type="range" min="-100" max="100" value="0"></a></label>
+			<label for="shaping-demo-slider-exponent">Exponent <input id="shaping-demo-slider-exponent" type="range" min="0" max="500" value="100"></a></label>
+			<label for="shaping-demo-slider-min">Min <input id="shaping-demo-slider-min" type="range" min="-100" max="100" value="-100"></a></label>
+			<label for="shaping-demo-slider-max">Max <input id="shaping-demo-slider-max" type="range" min="-100" max="100" value="100"></a></label>
+			<label for="shaping-demo-slider-postamp">Post-Gain <input id="shaping-demo-slider-postamp" type="range" min="0" max="200" value="100"></a></label>
+
+			<label for="shaping-demo-slider-abs">Absolute Value <input id="shaping-demo-slider-abs" type="checkbox"></a></label>
+		</div>
+
+		<p>
+			We have seen that complex patterns of numbers can be created by adding simple patterns together. You can further process these numbers to achieve specific effects. The example above shows three sequences: a sine wave, a saw wave, and a sum of sines. The numbers in each sequence fall between -1 and 1. By mathematically manipulating each number in the sequence we can shape it. Each slider above controls one manipulation. Here is what each one does.
+		</p>
+
+		<ul>
+			<li>Pre-Gain multiplies each number by a constant factor.</li>
+			<li>Bais adds a set amount to the values.</li>
+			<li>Exponent raises the number to a power. Powers above 1 sharpen peaks, powers below one round them off.</li>
+			<li>Min clamps low values to minimum allowed value.</li>
+			<li>Max clamps high values to maximum allowed value.</li>
+			<li>Post-Gain multiplies each number by a constant factor, again.</li>
+			<li>If you check the Absolute Value box, all negative values will be made positive.</li>
+			
+		</ul>
+		
+		<script type="text/coffeescript" src="scripts/shaping.coffee"></script>
+
+	</section>
+
+
+
+	<section id = "morie">
+		<h2>Morié Patterns: Emergence in Two-dimensional patterns</h2>
+		<div id="morie-demo" class="demo"><img src="images/2x1.png" /></div>
+		<div class = "demo-controls">
+			<label for="morie-demo-slider-a">A <input id="morie-demo-slider-a" type="range" min="0" max="100" value="85"></label>
+			<label for="morie-demo-slider-zoom">Zoom <input id="morie-demo-slider-zoom" type="range" min="50" max="500" value="500"></label>
+			<label for="morie-demo-menu-material">Material 
+				<select id="morie-demo-menu-material">
+					<option value="black">black</option> 
+					<option value="color">color</option> 
+					<option value="blur">blur</option> 
+				</select>
+			</label>
+		</div>
+
+		<p>
+			Combining simple patterns to create complex ones works with two-dimensional patterns as well. A common example is a <a href="http://en.wikipedia.org/wiki/Moir%C3%A9_pattern">Morie Pattern</a>, a pattern that appears when two similar patterns are overlaid with a slight shift in scale or rotation. Like the one-dimensional examples above, the resulting pattern is more complicates and repeats far less frequently.
+		</p>
+		<ul>
+			<li>A adjusts the rotation and scale of one of the layers</li>
+			<li>Zoom will scale the overall scene.</li>
+			<li>Material controls how the circles are drawn.</li>			
+		</ul>
+
+
+		<script type="text/coffeescript" src="scripts/morie.coffee"></script>
+
+	</section>
+
+
+
+	<section id = "island">
+		<h2>And The Islands Rise</h2>
+
+		<div id="island-demo" class="demo"><img src="images/2x1.png" /></div>
+		<div class = "demo-controls">
+			<label for="island-demo-slider-a">A <input id="island-demo-slider-a" type="range" min="2" max="100" value="20"> </label>
+			<label for="island-demo-slider-exponent">Exponent <input id="island-demo-slider-exponent" type="range" min="1" max="500" value="100"> </label>
+			<label for="island-demo-slider-min">Min <input id="island-demo-slider-min" type="range" min="0" max="100" value="0"> </label>
+			<label for="island-demo-slider-max">Max <input id="island-demo-slider-max" type="range" min="0" max="100" value="100"> </label>
+			<label for="island-demo-slider-mod">Mod <input id="island-demo-slider-mod" type="range" min="0" max="101" value="101"> </label>
+			<label for="island-demo-slider-ramp">Ramp <input id="island-demo-slider-ramp" type="range" min="0" max="100" value="0"> </label>
+			<label for="island-demo-show">Material 
+				<select id="island-demo-show">
+					<option value="base">base</option> 
+					<option value="shaped">shaped</option> 
+					<option value="colored">colored</option> 
+					<option value="island">island</option> 
+				</select>
+			</label>
+
+		</div>
+
+		<p>
+			Lorem ipsum.
+		</p>
+
+		<script type="text/coffeescript" src="scripts/islands.coffee"></script>
+	</section>
+
+
 
 
 	<!-- <section id = "setup">
@@ -75,26 +175,7 @@
 
 	
 
-	<section id = "morie">
-		<h2>Morié Patterns</h2>
-		<div id="morie-demo" class="demo"></div>
-		<div class = "demo-controls">
-			<label for="morie-demo-slider-a">A <input id="morie-demo-slider-A" type="range" min="0" max="100" value="100"></label>
-			<label for="morie-demo-slider-zoom">Zoom <input id="morie-demo-slider-Zoom" type="range" min="0" max="100" value="50"></label>
-			<label for="morie-demo-material">Material 
-				<select id="morie-demo-material">
-					<option value="black">black</option> 
-					<option value="color">color</option> 
-					<option value="blur">blur</option> 
-				</select>
-			</label>
-		</div>
-
-		<p>
-			Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Typi non habent claritatem insitam; est usus legentis in iis qui facit eorum claritatem. Investigationes demonstraverunt lectores legere me lius quod ii legunt saepius.
-		</p>
-
-	</section>
+	
 
 
 	<section id = "shaping">

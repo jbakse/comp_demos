@@ -23,7 +23,22 @@ a
 	border-bottom: 1px solid #0C9;
 }
 
+blockquote
+{
+	margin: 0;
+	font-size: 1.5em;
+}
 
+blockquote cite
+{
+	display: block;
+	font-size: 1.0rem;
+}
+
+ul
+{
+	padding: 0;
+}
 
 
 section {
@@ -37,29 +52,28 @@ main {
 }
 
 
-blockquote
-{
-	margin: 0;
-	font-size: 1.5em;
-}
 
-blockquote cite
-{
-	display: block;
-	font-size: 1.0rem;
-}
 
 
 .demo
 { 
 	border: 10px solid #BBB;
 	margin: 1em 0;
+	position: relative;
+}
+
+.demo canvas,
+.demo img
+{
+	width: 100%;
+	height: auto;
 }
 
 .demo canvas
 {
-	width: 100%;
-	height: auto;
+	position: absolute;
+	top: 0;
+	left: 0;
 }
 
 .demo-controls
