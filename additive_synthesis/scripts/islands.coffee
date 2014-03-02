@@ -4,16 +4,15 @@ island_demo = (el)->
 	
 	##
 	# load texture assets
-	
 	islandRampTex = THREE.ImageUtils.loadTexture 'images/island_ramp_256.png'
 	gradientTex = THREE.ImageUtils.loadTexture 'images/gradient_64.png'
-
+	gradient128Tex  = THREE.ImageUtils.loadTexture 'images/gradient_128.png'
 
 	##
 	# setup render textures
 
 	# base texture holds the initial dots
-	baseTexture = new THREE.WebGLRenderTarget 512, 512, {
+	baseTexture = new THREE.WebGLRenderTarget 1024 , 1024 , {
 		minFilter: THREE.LinearFilter
 		magFilter: THREE.NearestFilter
 		format: THREE.RGBFormat
@@ -21,7 +20,7 @@ island_demo = (el)->
 
 	# heightMap is the result of shaping the baseTexture
 	# used to control height of the island
-	heightMap = new THREE.WebGLRenderTarget 512, 512, {
+	heightMap = new THREE.WebGLRenderTarget 1024 , 1024 , {
 		minFilter: THREE.LinearFilter
 		magFilter: THREE.NearestFilter
 		format: THREE.RGBFormat
@@ -29,7 +28,7 @@ island_demo = (el)->
 
 	# colorMap is the result of applying the color ramp to the height map
 	# used to color the island
-	colorMap = new THREE.WebGLRenderTarget 512, 512, {
+	colorMap = new THREE.WebGLRenderTarget 1024 , 1024 , {
 		minFilter: THREE.LinearFilter
 		magFilter: THREE.NearestFilter
 		format: THREE.RGBFormat
@@ -45,6 +44,13 @@ island_demo = (el)->
 		side: THREE.DoubleSide
 		transparent: true
 		blending: THREE.MultiplyBlending
+
+
+	vignetteMaterial = new THREE.MeshBasicMaterial
+		map: gradient128Tex
+		side: THREE.DoubleSide
+		transparent: true
+		blending: THREE.AdditiveBlending
 
 	#used to displace and color the island plane
 	islandMaterial = new THREE.ShaderMaterial
@@ -93,12 +99,12 @@ island_demo = (el)->
 		transparent: false
 		uniforms: 
 			"tDiffuse": { type: "t", value: baseTexture }
-			"exponent": { type:"f", value: 1.0 }
-			"thresholdMin": { type:"f", value: 0.0 }
-			"thresholdMax": { type:"f", value: 1.0 }
-			"modLevel": { type:"f", value: 1.01 }
-			# "ramp": { type: "t", value: null }
-			# "rampLevel": { type:"f", value: 1.01 }
+			"preamp": { type:'f', value: 1.0 }
+			"bias": { type:'f', value: 1.0 }
+			"exponent": { type:'f', value: 1.0 }
+			"minThreshold": { type:'f', value: 1.0 }
+			"maxThreshold": { type:'f', value: 1.0 }
+			"postamp": { type:'f', value: 1.0 }
 
 		vertexShader:
 			"""
@@ -113,12 +119,12 @@ island_demo = (el)->
 		fragmentShader:
 			"""
 			uniform sampler2D tDiffuse;
+			uniform float preamp;
+			uniform float bias;
 			uniform float exponent;
-			uniform float thresholdMin;
-			uniform float thresholdMax;
-			uniform float modLevel;
-			//uniform float rampLevel;
-			//uniform sampler2D ramp;
+			uniform float minThreshold;
+			uniform float maxThreshold;
+			uniform float postamp;
 
 			varying vec2 vUv;
 
@@ -129,27 +135,30 @@ island_demo = (el)->
 				// make sure it is in the expected range
 				o = clamp(o, 0.0 , 1.0);
 				
+
+				// invert the colors, because it makes more sense for the processing for the dots to be 1.0 and the background to be 0.0
+				o = vec4(1.0, 1.0, 1.0, 1.0) - o;
+
+				// apply the preamp
+				o *= preamp;
+
 				// use pow function to shape the slope of the gradient
 				o = pow( o, vec4(exponent, exponent, exponent, exponent) );
 				
-				// apply the mod
-				o = mod( o, vec4(modLevel, modLevel, modLevel, modLevel)) / modLevel;
+				// apply the bias
+				o += bias;
 
-				//make anything under thresholdMin 0.0
-				o = step(vec4(thresholdMin, thresholdMin, thresholdMin, thresholdMin), o) * o;
-				o += vec4(.1, .1, .1, .1);
+				// apply the min/max
+				o = clamp(o, minThreshold, maxThreshold);
 
-				// make anything over threshold max 1.0
-				o = o + step(  vec4(thresholdMax, thresholdMax, thresholdMax, thresholdMax), o );
-				o = min( vec4(1.0, 1.0, 1.0, 1.0), o );
-			
-				// use the color lookup table to colorize the result
-				// o = texture2D( ramp, vec2(o.r, .95 - rampLevel));
-				// o = clamp(o, 0.0 , 1.0);
-				
+				// apply the postamp
+				o *= postamp;
+
+				// invert the colors back
+				o = vec4(1.0, 1.0, 1.0, 1.0) - o;
+
 				// set the alpha to 1.0 as we don't intend on any plending
 				o.a = 1.0;
-				
 
 				// set the output color
 				gl_FragColor = o;
@@ -211,7 +220,7 @@ island_demo = (el)->
 	setUpCircleGroup = (group, rows, cols, spacing, scaleX = 1, scaleY = 1)->
 		group.scale.set(.1, .1, .1);
 		for i in [0..(rows * cols - 1)]
-			circle = new THREE.Mesh( circleGeometry, circleMaterial );
+			circle = new THREE.Mesh( circleGeometry, circleMaterial )
 			row = Math.floor(i/cols)
 			col = i%cols
 			circle.scale.x = scaleX
@@ -231,6 +240,10 @@ island_demo = (el)->
 	groupC = new THREE.Object3D()
 	setUpCircleGroup groupC, 4, 4, 1.5, .5, .5
 	baseScene.add groupC
+
+	vignette = new THREE.Mesh circleGeometry, vignetteMaterial
+	vignette.scale.set(.75, .75, .75)
+	baseScene.add vignette
 
 	#set up post process scene
 	processScene = new THREE.Scene()
@@ -287,29 +300,49 @@ island_demo = (el)->
 		# inputs
 
 		sliderA = $('#island-demo-slider-a').val() / 100.0
+		vignetteBlend = $('#island-demo-slider-vignette').val() / 100.0
+		
+		preamp = $('#island-demo-slider-preamp').val() / 100.0
+		bias = $('#island-demo-slider-bias').val() / 100.0
+		exponent = $('#island-demo-slider-exponent').val() / 100.0
+		min = $('#island-demo-slider-min').val() / 100.0
+		max = $('#island-demo-slider-max').val() / 100.0
+		postamp = $('#island-demo-slider-postamp').val() / 100.0
+
+		rampLevel = $('#island-demo-slider-ramp').val() / 100.0
+
+
+	
+
+		##
+		# position layers
 		groupB.rotation.z = sliderA * .25;
 		groupB.position.x = sliderA * .25;
-
 		groupC.rotation.z = sliderA * -.5;
 		groupC.position.y = sliderA * -.5;
 
-		exponent = $('#island-demo-slider-exponent').val() / 100.0
-		shapingMaterial.uniforms[ 'exponent' ].value = exponent;
+		##
+		# fade out edges
+		vignette.material.opacity = vignetteBlend
+		vignette.material.needsUpdate = true
 
-		min = $('#island-demo-slider-min').val() / 100.0
-		shapingMaterial.uniforms[ 'thresholdMin' ].value = min;
+		##
+		# set shaping values
+		shapingMaterial.uniforms['preamp'].value = preamp;
+		shapingMaterial.uniforms['bias'].value = bias;
+		shapingMaterial.uniforms['exponent'].value = exponent;
+		shapingMaterial.uniforms['minThreshold'].value = min;
+		shapingMaterial.uniforms['maxThreshold'].value = max;
+		shapingMaterial.uniforms['postamp'].value = postamp;
 
-		max = $('#island-demo-slider-max').val() / 100.0
-		shapingMaterial.uniforms[ 'thresholdMax' ].value = max;
+		##
+		# set coloring values
+		coloringMaterial.uniforms['rampLevel'].value = rampLevel;
 
-		mod = $('#island-demo-slider-mod').val() / 100.0
-		shapingMaterial.uniforms[ 'modLevel' ].value = mod;
+		
 
-		ramp = $('#island-demo-slider-ramp').val() / 100.0
-		coloringMaterial.uniforms[ 'rampLevel' ].value = ramp;
-
-
-
+		##
+		# hide and show 
 		basePlane.visible = heightPlane.visible = colorPlane.visible = islandPlane.visible = false
 		show = $('#island-demo-show').val()
 		switch show
@@ -327,7 +360,6 @@ island_demo = (el)->
 
 		##
 		# animation
-
 		islandPlane.rotation.z += .0025;
 
 
@@ -351,8 +383,8 @@ class World
 	update: false
 
 	constructor: (@element)->
-		@width  = 512; #@element.clientWidth
-		@height = 256; #@element.clientHeight
+		@width  = 768; #@element.clientWidth
+		@height = 384; #@element.clientHeight
 		@aspect = @width / @height 
 		
 		@scene = new THREE.Scene()
