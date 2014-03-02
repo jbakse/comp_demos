@@ -1,0 +1,148 @@
+body { 
+	margin: 0 1em;
+	font-family: "Helvetica", sans;
+	font-size: 18px;
+	line-height: 1.5;
+	background-color: #F0F0F0;
+	color: black;
+} 
+
+h1 {
+	font-size: 3em;
+}
+
+h2 {
+	font-size: 2em;
+}
+
+a 
+{
+	color: #0C9;
+	text-decoration: none;
+
+	border-bottom: 1px solid #0C9;
+}
+
+blockquote
+{
+	margin: 0;
+	font-size: 1.5em;
+}
+
+blockquote cite
+{
+	display: block;
+	font-size: 1.0rem;
+}
+
+ul
+{
+	padding: 0;
+}
+
+
+section {
+	margin-bottom: 6em;
+}
+
+
+main {
+	max-width: 788px;
+	margin: 0 auto;
+}
+
+
+
+
+
+.demo
+{ 
+	border: 10px solid #BBB;
+	margin: 1em 0;
+	position: relative;
+}
+
+.demo canvas,
+.demo img
+{
+	width: 100%;
+	height: auto;
+}
+
+.demo canvas
+{
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+.demo-controls
+{ 
+	margin: 1em 0;
+	text-align: justify;
+	text-justify: distribute-all-lines;
+}
+
+.demo-controls:after
+{
+	content: "hi";
+	font-size: 0;
+	line-height: 0;
+	width: 100%;
+    display: inline-block;
+}
+
+.demo-controls label
+{
+	box-sizing: border-box;
+	width: 30%;
+	display: inline-block;
+	font-size: .8em;
+	margin-bottom: 1em;
+	vertical-align: top;
+}
+
+.demo-controls label input,
+.demo-controls label select
+{
+	display: block;
+	width: 100%;
+	margin-top: 5px;
+}
+
+.demo-controls label input
+{
+	margin-top: 7px;
+}
+
+.related-links
+{
+	margin: 0;
+	padding: 0;
+}
+
+
+.meta
+{
+	font-size: .8em;
+}
+
+.related-links li
+{
+	display: inline;
+
+}
+
+
+
+
+
+
+.ace_editor {
+	position: relative !important;
+	/*border: 1px solid lightgray;*/
+
+	height: 300px;
+	/*height: 200px;*/
+	/*width: 80%;*/
+}

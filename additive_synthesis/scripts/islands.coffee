@@ -1,185 +1,18 @@
-setup_demo = (element)->
-	width  = 512; 
-	height = 256; 
-	aspect = width / height 
-	
-	# create a 3D render using three.js
-	renderer = new THREE.WebGLRenderer()
-	renderer.setClearColor 0xFFFFFF, 1
-	renderer.setSize width, height
-	element.appendChild renderer.domElement
 
-	# create the scene
-	scene = new THREE.Scene()
-
-	# add a camera to the scene
-	camera = new THREE.OrthographicCamera(-.5, .5, -.5 / aspect  , .5 / aspect , 0, 1000)
-	camera.position.z = 5
-	scene.add camera
-
-	# create a material that will be when the circle is drawn
-	blueMaterial = new THREE.MeshBasicMaterial
-		color: 0x0000FF
-		side: THREE.DoubleSide
-
-	# create the circle geometry
-	circleGeometry = new THREE.CircleGeometry( .1, 32 );
-
-	# create the circle				
-	circle = new THREE.Mesh( circleGeometry, blueMaterial );
-	scene.add circle
-
-
-
-	renderer.render scene, camera
-
-
-
-	# render_loop: ()->
-	# 	update?()
-	# 	renderer.render scene, camera
-	# 	requestAnimationFrame ()=> _render_loop()
-
-	# # start the render loop
-	# render_loop()
-
-
-
-
-
-
-
-
-
-
-morie_demo = ()->
-	world = new World(document.getElementById('morie-demo')).start()
-	
-	##
-	# load textures
-
-	circleBlur = THREE.ImageUtils.loadTexture 'images/circle_blur_64.png'
-	white = THREE.ImageUtils.loadTexture 'images/white_64.png'
-
-	##
-	# setup materials
-
-	blurMaterial = new THREE.MeshBasicMaterial
-		map: circleBlur
-		side: THREE.DoubleSide
-		transparent: true
-		blending: THREE.MultiplyBlending
-
-	blueMaterial = new THREE.MeshBasicMaterial
-		map: white
-		color: 0x0000ff
-		side: THREE.DoubleSide
-		transparent: true
-		blending: THREE.MultiplyBlending
-
-	redMaterial = new THREE.MeshBasicMaterial
-		map: white
-		color: 0xff0000
-		side: THREE.DoubleSide
-		transparent: true
-		blending: THREE.MultiplyBlending
-
-	blackMaterial = new THREE.MeshBasicMaterial
-		map: white
-		color: 0x000000
-		side: THREE.DoubleSide
-
-
-	##
-	# create the circles
-
-	circleGeometry = new THREE.CircleGeometry( 1, 32 );				
-	
-	groupA = new THREE.Object3D()
-	groupA.scale.set(.01, .01, .01);
-	world.scene.add groupA
-
-	groupB = new THREE.Object3D()
-	groupB.scale.set(.01, .01, .01);
-	world.scene.add groupB
-
-	rows = 30
-	cols = 50
-	spacing = 2.5
-	
-	for i in [0..(rows * cols - 1)]
-		circle = new THREE.Mesh( circleGeometry, blurMaterial );
-		row = Math.floor(i/cols) - rows * .5
-		col = i%cols - cols * .5
-		circle.position.x = col * spacing 
-		circle.position.y = row * spacing 
-		groupA.add circle
-
-	for i in [0..(rows * cols - 1)]
-		circle = new THREE.Mesh( circleGeometry, blurMaterial );
-		row = Math.floor(i/cols) - rows * .5
-		col = i%cols - cols * .5
-		circle.position.x = col * spacing 
-		circle.position.y = row * spacing
-		circle.position.z = 1;
-		groupB.add circle
-
-	
-
-	world.update = ()->
-		sliderA = document.getElementById('morie-demo-slider-A').value / 100.0
-		sliderZoom = 1 + (document.getElementById('morie-demo-slider-Zoom').value / 100.0) * 6
-		material = document.getElementById('morie-demo-material').value
-		switch material
-			when "black"
-				for circle in groupA.children
-					circle.material = blackMaterial
-				for circle in groupB.children
-					circle.material = blackMaterial
-
-			when "color"
-				for circle in groupA.children
-					circle.material = redMaterial
-				for circle in groupB.children
-					circle.material = blueMaterial
-
-			when "blur"
-				for circle in groupA.children
-					circle.material = blurMaterial
-				for circle in groupB.children
-					circle.material = blurMaterial
-
-		groupA.rotation.z = sliderA * .25;
-		scale = (.01 + sliderA * .005) * sliderZoom
-		groupA.scale.set(scale, scale, scale)
-		groupA.position.set(sliderZoom * .1, sliderZoom * .1, 0)
-
-		scale = .01 * sliderZoom
-		groupB.scale.set(scale, scale, scale)
-		groupB.position.set(sliderZoom * .1, sliderZoom * .1, 0)
-
-
-
-
-
-
-
-
-shaping_demo = (el)->
-	world = new World(el).start()
+island_demo = (el)->
+	world = new World(el[0]).start()
 	
 	##
 	# load texture assets
-	
 	islandRampTex = THREE.ImageUtils.loadTexture 'images/island_ramp_256.png'
 	gradientTex = THREE.ImageUtils.loadTexture 'images/gradient_64.png'
-
+	gradient128Tex  = THREE.ImageUtils.loadTexture 'images/gradient_128.png'
 
 	##
 	# setup render textures
 
 	# base texture holds the initial dots
-	baseTexture = new THREE.WebGLRenderTarget 512, 512, {
+	baseTexture = new THREE.WebGLRenderTarget 1024 , 1024 , {
 		minFilter: THREE.LinearFilter
 		magFilter: THREE.NearestFilter
 		format: THREE.RGBFormat
@@ -187,7 +20,7 @@ shaping_demo = (el)->
 
 	# heightMap is the result of shaping the baseTexture
 	# used to control height of the island
-	heightMap = new THREE.WebGLRenderTarget 512, 512, {
+	heightMap = new THREE.WebGLRenderTarget 1024 , 1024 , {
 		minFilter: THREE.LinearFilter
 		magFilter: THREE.NearestFilter
 		format: THREE.RGBFormat
@@ -195,7 +28,7 @@ shaping_demo = (el)->
 
 	# colorMap is the result of applying the color ramp to the height map
 	# used to color the island
-	colorMap = new THREE.WebGLRenderTarget 512, 512, {
+	colorMap = new THREE.WebGLRenderTarget 1024 , 1024 , {
 		minFilter: THREE.LinearFilter
 		magFilter: THREE.NearestFilter
 		format: THREE.RGBFormat
@@ -211,6 +44,13 @@ shaping_demo = (el)->
 		side: THREE.DoubleSide
 		transparent: true
 		blending: THREE.MultiplyBlending
+
+
+	vignetteMaterial = new THREE.MeshBasicMaterial
+		map: gradient128Tex
+		side: THREE.DoubleSide
+		transparent: true
+		blending: THREE.AdditiveBlending
 
 	#used to displace and color the island plane
 	islandMaterial = new THREE.ShaderMaterial
@@ -259,12 +99,12 @@ shaping_demo = (el)->
 		transparent: false
 		uniforms: 
 			"tDiffuse": { type: "t", value: baseTexture }
-			"exponent": { type:"f", value: 1.0 }
-			"thresholdMin": { type:"f", value: 0.0 }
-			"thresholdMax": { type:"f", value: 1.0 }
-			"modLevel": { type:"f", value: 1.01 }
-			# "ramp": { type: "t", value: null }
-			# "rampLevel": { type:"f", value: 1.01 }
+			"preamp": { type:'f', value: 1.0 }
+			"bias": { type:'f', value: 1.0 }
+			"exponent": { type:'f', value: 1.0 }
+			"minThreshold": { type:'f', value: 1.0 }
+			"maxThreshold": { type:'f', value: 1.0 }
+			"postamp": { type:'f', value: 1.0 }
 
 		vertexShader:
 			"""
@@ -279,12 +119,12 @@ shaping_demo = (el)->
 		fragmentShader:
 			"""
 			uniform sampler2D tDiffuse;
+			uniform float preamp;
+			uniform float bias;
 			uniform float exponent;
-			uniform float thresholdMin;
-			uniform float thresholdMax;
-			uniform float modLevel;
-			//uniform float rampLevel;
-			//uniform sampler2D ramp;
+			uniform float minThreshold;
+			uniform float maxThreshold;
+			uniform float postamp;
 
 			varying vec2 vUv;
 
@@ -295,27 +135,30 @@ shaping_demo = (el)->
 				// make sure it is in the expected range
 				o = clamp(o, 0.0 , 1.0);
 				
+
+				// invert the colors, because it makes more sense for the processing for the dots to be 1.0 and the background to be 0.0
+				o = vec4(1.0, 1.0, 1.0, 1.0) - o;
+
+				// apply the preamp
+				o *= preamp;
+
 				// use pow function to shape the slope of the gradient
 				o = pow( o, vec4(exponent, exponent, exponent, exponent) );
 				
-				// apply the mod
-				o = mod( o, vec4(modLevel, modLevel, modLevel, modLevel)) / modLevel;
+				// apply the bias
+				o += bias;
 
-				//make anything under thresholdMin 0.0
-				o = step(vec4(thresholdMin, thresholdMin, thresholdMin, thresholdMin), o) * o;
-				o += vec4(.1, .1, .1, .1);
+				// apply the min/max
+				o = clamp(o, minThreshold, maxThreshold);
 
-				// make anything over threshold max 1.0
-				o = o + step(  vec4(thresholdMax, thresholdMax, thresholdMax, thresholdMax), o );
-				o = min( vec4(1.0, 1.0, 1.0, 1.0), o );
-			
-				// use the color lookup table to colorize the result
-				// o = texture2D( ramp, vec2(o.r, .95 - rampLevel));
-				// o = clamp(o, 0.0 , 1.0);
-				
+				// apply the postamp
+				o *= postamp;
+
+				// invert the colors back
+				o = vec4(1.0, 1.0, 1.0, 1.0) - o;
+
 				// set the alpha to 1.0 as we don't intend on any plending
 				o.a = 1.0;
-				
 
 				// set the output color
 				gl_FragColor = o;
@@ -377,7 +220,7 @@ shaping_demo = (el)->
 	setUpCircleGroup = (group, rows, cols, spacing, scaleX = 1, scaleY = 1)->
 		group.scale.set(.1, .1, .1);
 		for i in [0..(rows * cols - 1)]
-			circle = new THREE.Mesh( circleGeometry, circleMaterial );
+			circle = new THREE.Mesh( circleGeometry, circleMaterial )
 			row = Math.floor(i/cols)
 			col = i%cols
 			circle.scale.x = scaleX
@@ -397,6 +240,10 @@ shaping_demo = (el)->
 	groupC = new THREE.Object3D()
 	setUpCircleGroup groupC, 4, 4, 1.5, .5, .5
 	baseScene.add groupC
+
+	vignette = new THREE.Mesh circleGeometry, vignetteMaterial
+	vignette.scale.set(.75, .75, .75)
+	baseScene.add vignette
 
 	#set up post process scene
 	processScene = new THREE.Scene()
@@ -452,32 +299,52 @@ shaping_demo = (el)->
 		##
 		# inputs
 
-		sliderA = document.getElementById('shaping-demo-slider-a').value / 100.0
+		sliderA = $('#island-demo-slider-a').val() / 100.0
+		vignetteBlend = $('#island-demo-slider-vignette').val() / 100.0
+		
+		preamp = $('#island-demo-slider-preamp').val() / 100.0
+		bias = $('#island-demo-slider-bias').val() / 100.0
+		exponent = $('#island-demo-slider-exponent').val() / 100.0
+		min = $('#island-demo-slider-min').val() / 100.0
+		max = $('#island-demo-slider-max').val() / 100.0
+		postamp = $('#island-demo-slider-postamp').val() / 100.0
+
+		rampLevel = $('#island-demo-slider-ramp').val() / 100.0
+
+
+	
+
+		##
+		# position layers
 		groupB.rotation.z = sliderA * .25;
 		groupB.position.x = sliderA * .25;
-
 		groupC.rotation.z = sliderA * -.5;
 		groupC.position.y = sliderA * -.5;
 
-		exponent = document.getElementById('shaping-demo-slider-exponent').value / 100.0
-		shapingMaterial.uniforms[ 'exponent' ].value = exponent;
+		##
+		# fade out edges
+		vignette.material.opacity = vignetteBlend
+		vignette.material.needsUpdate = true
 
-		min = document.getElementById('shaping-demo-slider-min').value / 100.0
-		shapingMaterial.uniforms[ 'thresholdMin' ].value = min;
+		##
+		# set shaping values
+		shapingMaterial.uniforms['preamp'].value = preamp;
+		shapingMaterial.uniforms['bias'].value = bias;
+		shapingMaterial.uniforms['exponent'].value = exponent;
+		shapingMaterial.uniforms['minThreshold'].value = min;
+		shapingMaterial.uniforms['maxThreshold'].value = max;
+		shapingMaterial.uniforms['postamp'].value = postamp;
 
-		max = document.getElementById('shaping-demo-slider-max').value / 100.0
-		shapingMaterial.uniforms[ 'thresholdMax' ].value = max;
+		##
+		# set coloring values
+		coloringMaterial.uniforms['rampLevel'].value = rampLevel;
 
-		mod = document.getElementById('shaping-demo-slider-mod').value / 100.0
-		shapingMaterial.uniforms[ 'modLevel' ].value = mod;
+		
 
-		ramp = document.getElementById('shaping-demo-slider-ramp').value / 100.0
-		coloringMaterial.uniforms[ 'rampLevel' ].value = ramp;
-
-
-
+		##
+		# hide and show 
 		basePlane.visible = heightPlane.visible = colorPlane.visible = islandPlane.visible = false
-		show = document.getElementById('shaping-demo-show').value
+		show = $('#island-demo-show').val()
 		switch show
 			when "base"
 				basePlane.visible = true
@@ -493,7 +360,6 @@ shaping_demo = (el)->
 
 		##
 		# animation
-
 		islandPlane.rotation.z += .0025;
 
 
@@ -512,21 +378,13 @@ shaping_demo = (el)->
 		world.renderer.render( processScene, processCamera, colorMap, true);
 
 
-
-
-
-
-
-
-#boiler plate
-
 class World
 
 	update: false
 
 	constructor: (@element)->
-		@width  = 512; #@element.clientWidth
-		@height = 256; #@element.clientHeight
+		@width  = 768; #@element.clientWidth
+		@height = 384; #@element.clientHeight
 		@aspect = @width / @height 
 		
 		@scene = new THREE.Scene()
@@ -552,48 +410,5 @@ class World
 		@_render_loop()
 		this
 
-class CanvasLayer
-	constructor: (@world)->
 
-		canvas = document.createElement 'canvas' 
-		canvas.width = 512
-		canvas.height = 256
-
-
-		@_canvasTexture = new THREE.Texture(canvas) 
-		@_canvasTexture.needsUpdate = true
-
-
-		canvasMaterial = new THREE.MeshBasicMaterial
-			map: @_canvasTexture
-
-		planeGeometry = new THREE.PlaneGeometry 1, 1 / @world.aspect 
-		mesh = new THREE.Mesh planeGeometry, canvasMaterial 
-		mesh.rotation.x = Math.PI
-		@world.scene.add mesh
-
-		@context = canvas.getContext '2d'
-
-	update: ()->
-		@_canvasTexture.needsUpdate = true;
-
-	blank: (color)->
-		@context.beginPath();
-		@context.rect(0, 0, 512, 512);
-		@context.fillStyle = color;
-		@context.fill();
-
-
-
-
-jQuery ->
-	$('#setup-demo').each (e)->
-		setup_demo this
-
-	
-
-	$('#morie-demo').each (e)->
-		morie_demo this
-
-	$('#shaping-demo').each (e)->
-		shaping_demo this
+island_demo $('#island-demo')
