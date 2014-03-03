@@ -1,7 +1,24 @@
 
-island_demo = (el)->
-	world = new World(el[0]).start()
+island_demo = (element)->
 	
+	##
+	# D3 Boilerplate
+
+	width  = 768;
+	height = 384;
+	aspect = width / height 
+	
+	scene = new THREE.Scene()
+
+	camera = new THREE.OrthographicCamera(-.5, .5, -.5 / aspect  , .5 / aspect , 0, 1000)
+	camera.position.z = 5
+	scene.add camera
+
+	renderer = new THREE.WebGLRenderer()
+	renderer.setClearColor 0xFFFFFF, 1
+	renderer.setSize width, height
+	element[0].appendChild renderer.domElement
+		
 	##
 	# load texture assets
 	islandRampTex = THREE.ImageUtils.loadTexture 'images/island_ramp_256.png'
@@ -254,34 +271,30 @@ island_demo = (el)->
 	processQuad.rotation.x = Math.PI
 	processScene.add processQuad
 
-	# set up world scene
+	# set up scene
 
 	planeGeometry = new THREE.PlaneGeometry( 1, 1);
+
+	#plane used to show the dots that form the base
 	basePlane = new THREE.Mesh planeGeometry, 
 		new THREE.MeshBasicMaterial
 			map: baseTexture
 			side: THREE.DoubleSide
-	# basePlane.position.set(-.4,-.15,-20)
-	# basePlane.scale.set(.25,.25,.25);
-	world.scene.add basePlane
+	scene.add basePlane
 
 	# plane used to show the heightmap
 	heightPlane = new THREE.Mesh planeGeometry, 
 		new THREE.MeshBasicMaterial
 			map: heightMap
 			side: THREE.DoubleSide
-	# heightPlane.position.set(-.1,-.15,-20)
-	# heightPlane.scale.set(.25,.25,.25);
-	world.scene.add heightPlane
+	scene.add heightPlane
 
 	# plane used to show the colormap
 	colorPlane = new THREE.Mesh planeGeometry, 
 		new THREE.MeshBasicMaterial
 			map: colorMap
 			side: THREE.DoubleSide
-	# colorPlane.position.set(.2,-.15,-20)
-	# colorPlane.scale.set(.25,.25,.25);
-	world.scene.add colorPlane
+	scene.add colorPlane
 
 	# plane that shows the 3d island
 	islandGeometry = new THREE.PlaneGeometry( 1, 1, 100, 100);
@@ -289,13 +302,15 @@ island_demo = (el)->
 	islandPlane.scale.set(1.5, 1.5, 1.5)
 	islandPlane.position.set(0.0,-.1,0.0)
 	islandPlane.rotation.x = Math.PI * - .65
-	world.scene.add islandPlane
+	scene.add islandPlane
 
 	##
 	# main animation loop
+	needsUpdate = true
+	update = ()->
+		requestAnimationFrame ()=> update()
+		if not needsUpdate then return
 
-	world.update = ()->
-		
 		##
 		# inputs
 
@@ -311,7 +326,7 @@ island_demo = (el)->
 
 		rampLevel = $('#island-demo-slider-ramp').val() / 100.0
 
-
+		show = $('#island-demo-show').val()
 	
 
 		##
@@ -344,7 +359,7 @@ island_demo = (el)->
 		##
 		# hide and show 
 		basePlane.visible = heightPlane.visible = colorPlane.visible = islandPlane.visible = false
-		show = $('#island-demo-show').val()
+		
 		switch show
 			when "base"
 				basePlane.visible = true
@@ -367,48 +382,42 @@ island_demo = (el)->
 		# render sequence
 		
 		# render the circles into baseTexture
-		world.renderer.render( baseScene, baseCamera, baseTexture, true );
+		renderer.render( baseScene, baseCamera, baseTexture, true );
 
 		# shape baseTexture, store in heightMap
 		processQuad.material = shapingMaterial
-		world.renderer.render( processScene, processCamera, heightMap, true);
+		renderer.render( processScene, processCamera, heightMap, true);
 
 		# color heightMap, store in colorMap
 		processQuad.material = coloringMaterial
-		world.renderer.render( processScene, processCamera, colorMap, true);
+		renderer.render( processScene, processCamera, colorMap, true);
 
+		# draw the screen scene
+		renderer.render scene, camera
 
-class World
-
-	update: false
-
-	constructor: (@element)->
-		@width  = 768; #@element.clientWidth
-		@height = 384; #@element.clientHeight
-		@aspect = @width / @height 
 		
-		@scene = new THREE.Scene()
+		if show != "island"
+			needsUpdate = false
 
-		@camera = new THREE.OrthographicCamera(-.5, .5, -.5 / @aspect  , .5 / @aspect , 0, 1000)
-		@camera.position.z = 5
-		@scene.add @camera
-
-		@renderer = new THREE.WebGLRenderer()
-		@renderer.setClearColor 0xFFFFFF, 1
-		@renderer.setSize @width, @height
-		@element.appendChild @renderer.domElement
 		
 
+	# draw once now, and again when the controls are used
+	
+	update()
+	$('#island-demo-slider-a
+		#island-demo-slider-vignette,
+		#island-demo-slider-preamp,
+		#island-demo-slider-bias,
+		#island-demo-slider-exponent,
+		#island-demo-slider-min,
+		#island-demo-slider-max,
+		#island-demo-slider-postamp,
+		#island-demo-slider-ramp,
+		#island-demo-show').change ()-> needsUpdate = true
 
-	_render_loop: ()->
-		requestAnimationFrame ()=> @_render_loop()
-		@update?()
-		@renderer.render @scene, @camera
+
+	
 
 
-	start: ()->
-		@_render_loop()
-		this
-
-
+# start the demo
 island_demo $('#island-demo')
