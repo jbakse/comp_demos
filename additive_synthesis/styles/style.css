@@ -55,7 +55,8 @@ main {
 
 
 
-.demo
+.demo,
+.figure
 { 
 	border: 10px solid #BBB;
 	margin: 1em 0;

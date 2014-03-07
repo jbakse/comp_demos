@@ -20,9 +20,9 @@ island_demo = (element)->
 		
 	##
 	# load texture assets
-	islandRampTex = THREE.ImageUtils.loadTexture 'images/island_ramp_256.png'
-	gradientTex = THREE.ImageUtils.loadTexture 'images/gradient_64.png'
-	gradient128Tex  = THREE.ImageUtils.loadTexture 'images/gradient_128.png'
+	islandRampTex = THREE.ImageUtils.loadTexture 'assets/island_ramp_256.png'
+	gradientTex = THREE.ImageUtils.loadTexture 'assets/gradient_64.png'
+	gradient128Tex  = THREE.ImageUtils.loadTexture 'assets/gradient_128.png'
 
 	##
 	# setup render textures
