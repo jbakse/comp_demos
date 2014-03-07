@@ -24,8 +24,8 @@ morie_demo = (element)->
 
 	##
 	# load textures
-	circleBlur = THREE.ImageUtils.loadTexture 'images/circle_blur_64.png'
-	white = THREE.ImageUtils.loadTexture 'images/white_64.png'
+	circleBlur = THREE.ImageUtils.loadTexture 'assets/circle_blur_64.png'
+	white = THREE.ImageUtils.loadTexture 'assets/white_64.png'
 
 
 	##

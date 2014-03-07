@@ -15,6 +15,8 @@
 	<main>
 	<h1>Generating Form</h1>
 
+	<section id = "Intro">
+
 	<blockquote cite="http://markwunsch.com/blog/2008/09/27/design-q-a-with-charles-eames.html">
 	  Q: Can the computer substitute for the Designer? <br/>
 	  A: Probably, in some special cases, but usually the computer is an aid to the Designer.
@@ -28,7 +30,21 @@
 	<p>
 		It is also possible to create form entirely from code. There are countless techniques in generative art, some of the most well known include: fractals, <a href="http://recursivedrawing.com/">recursion</a>, l-systems, Markov-chains, cellular automata, and Perlin noise. In this presentation I will show one way to create a <b>complex</b>, <b>controlled</b>, and <b>deterministic</b> form almost entirely from code.
 	</p>
-	
+	<p>
+		This demo application is...
+		variety Create a  of landscapes
+		Deterministic Not use random
+		Complex appearance, not simple, no clear pattern
+		controlled, paramerterized customizable
+		use a minimum of external assets
+	<p>
+	<img class="figure" src = "images/island_samples.jpg" />
+	</section>
+
+
+
+
+
 	<section id = "additive">
 		<h2>Additive Synthesis: Combining Simple Patterns Gives Rise to Complex Patterns</h2>
 		
@@ -84,6 +100,38 @@
 
 	</section>
 
+
+	<section id = "shaping-two">
+	
+		
+		<div id="shaping-two-demo" class="demo"><img src="images/2x1.png" /></div>
+		<div class = "demo-controls">
+			<label class="full" for="shaping-two-demo-generator">Generator <input id="shaping-two-demo-generator" type="text" value="Math.sin(x/20)"></a></label>
+			<label class="full" for="shaping-two-demo-filter">Filter <input id="shaping-two-demo-filter" type="text" value="x * .5 + .5"></a></label>
+
+		</div>
+		
+		<script type="text/coffeescript" src="scripts/shaping_two.coffee"></script>
+
+	</section>
+
+
+	<section id = "setup">
+		<h2>Setting up Three JS</h2>
+		
+		<div id="setup-demo" class="demo"><img src="images/2x1.png" /></div>
+
+		<div class = "demo-controls">
+			<button id="setup-demo-button-animate">Animate</button>
+			
+		</div>
+
+		<p>
+			Three.js is...
+		</p>
+
+		<script type="text/coffeescript" src="scripts/setup_threejs.coffee"></script>
+	</section>
 
 
 	<section id = "morie">

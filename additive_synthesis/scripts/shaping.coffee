@@ -1,4 +1,4 @@
-additive_demo = (element)->
+shaping_demo = (element)->
 	# create a canvas and add it to the target element
 	canvas = document.createElement 'canvas'
 	canvas.width = 768
@@ -138,4 +138,4 @@ additive_demo = (element)->
 
 
 # kick off the demo
-additive_demo $('#shaping-demo')
+shaping_demo $('#shaping-demo')

@@ -1,13 +1,13 @@
 setup_demo = (element)->
-	width  = 512; 
-	height = 256; 
+	width  = 768; 
+	height = 384; 
 	aspect = width / height 
 	
 	# create a 3D render using three.js
 	renderer = new THREE.WebGLRenderer()
 	renderer.setClearColor 0xFFFFFF, 1
 	renderer.setSize width, height
-	element.appendChild renderer.domElement
+	element[0].appendChild renderer.domElement
 
 	# create the scene
 	scene = new THREE.Scene()
@@ -32,3 +32,15 @@ setup_demo = (element)->
 
 
 	renderer.render scene, camera
+
+	animate = ()->
+		requestAnimationFrame ()=> animate()
+		circle.rotation.x += .02
+
+		renderer.render scene, camera
+
+
+	$('#setup-demo-button-animate').one "click", animate
+
+# kick off the demo
+setup_demo $('#setup-demo')

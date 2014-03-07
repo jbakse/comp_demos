@@ -55,7 +55,8 @@ main {
 
 
 
-.demo
+.demo,
+.figure
 { 
 	border: 10px solid #BBB;
 	margin: 1em 0;
@@ -102,6 +103,11 @@ main {
 	vertical-align: top;
 }
 
+.demo-controls label.full
+{
+	width: 100%;
+}
+
 .demo-controls label input,
 .demo-controls label select
 {
@@ -113,6 +119,13 @@ main {
 .demo-controls label input
 {
 	margin-top: 7px;
+}
+
+
+
+.demo-controls input.error
+{
+	background-color:  #ffcccc;
 }
 
 .related-links
