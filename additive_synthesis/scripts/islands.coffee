@@ -1,4 +1,3 @@
-
 island_demo = (element)->
 	
 	##
