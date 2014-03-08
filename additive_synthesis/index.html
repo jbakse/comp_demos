@@ -5,6 +5,10 @@
 
 	<script src="lib/jquery-2.1.0.min.js"></script>
 	<script src="lib/coffee-script.js"></script>
+	<script data-main="main" src="lib/require.js"></script>
+
+
+
 	<script src="lib/three/three.min.js"></script>
 	
 	<link type="text/css" rel = "stylesheet" href="styles/style.css">
@@ -14,6 +18,13 @@
 <body>
 	<main>
 	<h1>Generating Form</h1>
+
+	<section id="test" class="markdown" data-src="test.md">
+
+
+
+
+	</section>
 
 	<section id = "Intro">
 
@@ -116,7 +127,7 @@
 	</section>
 
 
-	<section id = "setup">
+	<!-- <section id = "setup">
 		<h2>Setting up Three JS</h2>
 		
 		<div id="setup-demo" class="demo"><img src="images/2x1.png" /></div>
@@ -131,8 +142,8 @@
 		</p>
 
 		<script type="text/coffeescript" src="scripts/setup_threejs.coffee"></script>
-	</section>
-
+	</section> -->
+<!-- 
 
 	<section id = "morie">
 		<h2>Morié Patterns: Emergence in Two-dimensional patterns</h2>
@@ -183,11 +194,7 @@
 
 
 
-<!-- 			<label for="island-demo-slider-exponent">Exponent <input id="island-demo-slider-exponent" type="range" min="1" max="500" value="100"> </label>
-			<label for="island-demo-slider-min">Min <input id="island-demo-slider-min" type="range" min="0" max="100" value="0"> </label>
-			<label for="island-demo-slider-max">Max <input id="island-demo-slider-max" type="range" min="0" max="100" value="100"> </label>
-			<label for="island-demo-slider-mod">Mod <input id="island-demo-slider-mod" type="range" min="0" max="101" value="101"> </label>
- -->
+
 			<label for="island-demo-slider-ramp">Ramp <input id="island-demo-slider-ramp" type="range" min="0" max="100" value="0"> </label>
 			<label for="island-demo-show">Show 
 				<select id="island-demo-show">
@@ -206,7 +213,7 @@
 
 		<script type="text/coffeescript" src="scripts/islands.coffee"></script>
 	</section>
-
+ -->
 
 
 
@@ -299,6 +306,8 @@
 
 
 	</main>
+
+	
 </body>
 
 <script>
