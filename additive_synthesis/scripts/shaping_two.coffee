@@ -85,7 +85,7 @@ shaping_two_demo = (element)->
 			console.log error
 
 		try
-			eval """filter = function(x){return (#{filterInput});}"""
+			eval """filter = function(y){return (#{filterInput});}"""
 			filter(1)
 		catch error
 			fitlerWorks = false

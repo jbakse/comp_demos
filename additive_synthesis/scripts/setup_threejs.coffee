@@ -44,4 +44,3 @@ setup_demo = (element)->
 
 # kick off the demo
 setup_demo $('#setup-demo')
-console.log "hello setup"

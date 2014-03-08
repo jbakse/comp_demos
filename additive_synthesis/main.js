@@ -26,8 +26,7 @@ require(["lib/marked"], function(marked) {
 			//find coffeescript tags in inserted markdown and run it
 			$(el).find('script[type="text/coffeescript"]').each(function() {
 				CoffeeScript.load(this.src, function(source) {
-					console.log(source);
-					CoffeeScript.run.apply(null, source);
+					//CoffeeScript.run.apply(null, source);
 				});
 			});
 		});

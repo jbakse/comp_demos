@@ -17,12 +17,15 @@ island_demo = (element)->
 	renderer.setClearColor 0xFFFFFF, 1
 	renderer.setSize width, height
 	element[0].appendChild renderer.domElement
-		
+	
+	# needsUpdate - does the scene need to be redrawn?
+	needsUpdate = true
+
 	##
 	# load texture assets
-	islandRampTex = THREE.ImageUtils.loadTexture 'assets/island_ramp_256.png'
-	gradientTex = THREE.ImageUtils.loadTexture 'assets/gradient_64.png'
-	gradient128Tex  = THREE.ImageUtils.loadTexture 'assets/gradient_128.png'
+	islandRampTex = THREE.ImageUtils.loadTexture 'assets/island_ramp_256.png', {}, ()-> needsUpdate = true
+	gradientTex = THREE.ImageUtils.loadTexture 'assets/gradient_64.png', {}, ()-> needsUpdate = true
+	gradient128Tex  = THREE.ImageUtils.loadTexture 'assets/gradient_128.png', {}, ()-> needsUpdate = true
 
 	##
 	# setup render textures
@@ -305,11 +308,12 @@ island_demo = (element)->
 
 	##
 	# main animation loop
-	needsUpdate = true
+	
 	update = ()->
 		requestAnimationFrame ()=> update()
+		
 		if not needsUpdate then return
-
+		
 		##
 		# inputs
 
@@ -394,16 +398,21 @@ island_demo = (element)->
 		# draw the screen scene
 		renderer.render scene, camera
 
-		
-		if show != "island"
-			needsUpdate = false
+		#note that we rendered this frame 
+		needsUpdate = false
 
+		#the island view animates, so we need to draw over and over
+		if show == "island"
+			needsUpdate = true
 		
 
-	# draw once now, and again when the controls are used
-	
+	# start the animation update loop
 	update()
-	$('#island-demo-slider-a
+
+	
+
+	# redraw when user interacts
+	$('#island-demo-slider-a,
 		#island-demo-slider-vignette,
 		#island-demo-slider-preamp,
 		#island-demo-slider-bias,
@@ -412,7 +421,8 @@ island_demo = (element)->
 		#island-demo-slider-max,
 		#island-demo-slider-postamp,
 		#island-demo-slider-ramp,
-		#island-demo-show').change ()-> needsUpdate = true
+		#island-demo-show').change ()-> 
+			needsUpdate = true
 
 
 	

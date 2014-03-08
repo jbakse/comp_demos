@@ -41,17 +41,14 @@ ul
 }
 
 
-section {
-	margin-bottom: 6em;
+h2 {
+	margin-top: 3em;
 }
-
 
 main {
 	max-width: 788px;
 	margin: 0 auto;
 }
-
-
 
 
 
@@ -103,8 +100,22 @@ main {
 	vertical-align: top;
 }
 
+.demo-controls label>span
+{
+	display: table; width: 100%;
+}
+
+.demo-controls label>span .prefix
+{
+	display: table-cell; 
+	width: 30px;
+	font-family: Monaco;
+	font-size: 12px;
+}
+
 .demo-controls label.full
 {
+	
 	width: 100%;
 }
 
