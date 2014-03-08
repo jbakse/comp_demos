@@ -104,7 +104,7 @@ The Demo below shows how to setup, render, and animate a basic scene.
 
 Combining simple patterns to create complex ones works with two-dimensional patterns as well. A common example is a [Morie Pattern](http://en.wikipedia.org/wiki/Moir%C3%A9_pattern), a pattern that emerges when two similar patterns are overlaid with a slight shift in scale or rotation. Like the one-dimensional examples above, the resulting pattern is more complicated and repeats less frequently.
 
-The demo above draws two patterns of dots. When zoomed out you can see the Morie Patterns clearly. Upclose, the underlying patterns can become lost.
+The demo above draws two patterns of dots. When zoomed out you can see the Morie Patterns clearly. Up close, the underlying patterns can become lost.
 
 <div id="morie-demo" class="demo"><img src="images/2x1.png" /></div>
 <div class = "demo-controls">
@@ -124,11 +124,22 @@ The demo above draws two patterns of dots. When zoomed out you can see the Morie
 - **Zoom** will scale the overall scene.
 - **Material** controls how the material used to draw and combine the patterns.
 
-The first demos created a set of numbers using a purely mathematical approach. This demo constructs an image by drawing circles following a specific procedure. The image can be considered as a set of numbers. Each pixel in the image is represented by three numbers ranging from 0 to 255. These numbers are interpreed as the red level, green level, and blue level when the image is drawn. We could intepret these numbers differently though. In the next demo we will do just that.
+The first demos created a set of numbers using a purely mathematical approach. This demo constructs an image by drawing circles following a specific procedure. The image can be considered as a set of numbers. Each pixel in the image is represented by three numbers ranging from 0 to 255. These numbers are interpreted as the red level, green level, and blue level when the image is drawn. We could interpret these numbers differently though. In the next demo we will do just that.
 
 
 
 ##And The Islands Rise
+
+The next demo combines the the previous techniques (and some new ones) to create the 3D island. This demo is more complex than the previous ones. Lets break it down:
+
+###Generate
+The program begins by drawing three grids of blurry dots. The grids are multiplied together like in the Moire demo.
+
+###Filter
+The program then filters the image by applying a function to the color values of each pixel. The function is basically the same as the one used to bend the waves above.
+
+###Interpret
+The program then interprets the gray scale values of the image. Instead of considering the values as the Red, Green, and Blue values to display, the program uses the brightness to look up a color in table. This works like a color-by-number. The 3D view also uses the brightness of the pixel. This time it determines the height of the island at each point.
 
 <div id="island-demo" class="demo"><img src="images/2x1.png" /></div>
 <div class = "demo-controls">
@@ -144,10 +155,10 @@ The first demos created a set of numbers using a purely mathematical approach. T
 	<label for="island-demo-slider-ramp">Ramp <input id="island-demo-slider-ramp" type="range" min="0" max="100" value="0"> </label>
 	<label for="island-demo-show">Show 
 		<select id="island-demo-show">
-			<option value="base">base</option> 
-			<option value="shaped">shaped</option> 
-			<option value="colored">colored</option> 
-			<option value="island">island</option> 
+			<option value="base">Generate</option> 
+			<option value="shaped">Filter</option> 
+			<option value="colored">Interpret: 2D</option> 
+			<option value="island">Interpret: 3D</option> 
 		</select>
 	</label>
 </div>
