@@ -137,5 +137,16 @@ shaping_demo = (element)->
 		#shaping-demo-slider-abs').change drawWaves
 
 
+# inject the controls
+$('#shaping-demo-controls, #lab-demo-controls').html """
+<label for="shaping-demo-slider-preamp">Pre-Gain <input id="shaping-demo-slider-preamp" type="range" min="0" max="200" value="100"></input></label>
+<label for="shaping-demo-slider-bias">Bias <input id="shaping-demo-slider-bias" type="range" min="-100" max="100" value="0"></input></label>
+<label for="shaping-demo-slider-exponent">Exponent <input id="shaping-demo-slider-exponent" type="range" min="0" max="500" value="100"></input></label>
+<label for="shaping-demo-slider-min">Min <input id="shaping-demo-slider-min" type="range" min="-100" max="100" value="-100"></input></label>
+<label for="shaping-demo-slider-max">Max <input id="shaping-demo-slider-max" type="range" min="-100" max="100" value="100"></input></label>
+<label for="shaping-demo-slider-postamp">Post-Gain <input id="shaping-demo-slider-postamp" type="range" min="0" max="200" value="100"></input></label>
+<label for="shaping-demo-slider-abs">Absolute Value <input id="shaping-demo-slider-abs" type="checkbox"></input></label>
+"""
+
 # kick off the demo
-shaping_demo $('#shaping-demo')
+shaping_demo $('#shaping-demo, #lab-demo')

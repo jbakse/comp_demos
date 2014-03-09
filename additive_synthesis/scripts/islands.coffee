@@ -17,12 +17,15 @@ island_demo = (element)->
 	renderer.setClearColor 0xFFFFFF, 1
 	renderer.setSize width, height
 	element[0].appendChild renderer.domElement
-		
+	
+	# needsUpdate - does the scene need to be redrawn?
+	needsUpdate = true
+
 	##
 	# load texture assets
-	islandRampTex = THREE.ImageUtils.loadTexture 'assets/island_ramp_256.png'
-	gradientTex = THREE.ImageUtils.loadTexture 'assets/gradient_64.png'
-	gradient128Tex  = THREE.ImageUtils.loadTexture 'assets/gradient_128.png'
+	islandRampTex = THREE.ImageUtils.loadTexture 'assets/island_ramp_256.png', {}, ()-> needsUpdate = true
+	gradientTex = THREE.ImageUtils.loadTexture 'assets/gradient_64.png', {}, ()-> needsUpdate = true
+	gradient128Tex  = THREE.ImageUtils.loadTexture 'assets/gradient_128.png', {}, ()-> needsUpdate = true
 
 	##
 	# setup render textures
@@ -305,11 +308,12 @@ island_demo = (element)->
 
 	##
 	# main animation loop
-	needsUpdate = true
+	
 	update = ()->
 		requestAnimationFrame ()=> update()
+		
 		if not needsUpdate then return
-
+		
 		##
 		# inputs
 
@@ -394,16 +398,21 @@ island_demo = (element)->
 		# draw the screen scene
 		renderer.render scene, camera
 
-		
-		if show != "island"
-			needsUpdate = false
+		#note that we rendered this frame 
+		needsUpdate = false
 
+		#the island view animates, so we need to draw over and over
+		if show == "island"
+			needsUpdate = true
 		
 
-	# draw once now, and again when the controls are used
-	
+	# start the animation update loop
 	update()
-	$('#island-demo-slider-a
+
+	
+
+	# redraw when user interacts
+	$('#island-demo-slider-a,
 		#island-demo-slider-vignette,
 		#island-demo-slider-preamp,
 		#island-demo-slider-bias,
@@ -412,11 +421,31 @@ island_demo = (element)->
 		#island-demo-slider-max,
 		#island-demo-slider-postamp,
 		#island-demo-slider-ramp,
-		#island-demo-show').change ()-> needsUpdate = true
+		#island-demo-show').change ()-> 
+			needsUpdate = true
 
 
 	
-
+# inject controls
+$('#island-demo-controls, #lab-demo-controls').html """
+<label for="island-demo-slider-a">A <input id="island-demo-slider-a" type="range" min="2" max="100" value="20"> </label>
+<label for="island-demo-slider-vignette">Vignette <input id="island-demo-slider-vignette" type="range" min="0" max="100" value="0"> </label>
+<label for="island-demo-slider-preamp">Pre-Gain <input id="island-demo-slider-preamp" type="range" min="0" max="200" value="100"></a></label>
+<label for="island-demo-slider-bias">Bias <input id="island-demo-slider-bias" type="range" min="-100" max="100" value="0"></a></label>
+<label for="island-demo-slider-exponent">Exponent <input id="island-demo-slider-exponent" type="range" min="0" max="500" value="100"></a></label>
+<label for="island-demo-slider-min">Min <input id="island-demo-slider-min" type="range" min="0" max="100" value="0"></a></label>
+<label for="island-demo-slider-max">Max <input id="island-demo-slider-max" type="range" min="0" max="100" value="100"></a></label>
+<label for="island-demo-slider-postamp">Post-Gain <input id="island-demo-slider-postamp" type="range" min="0" max="200" value="100"></a></label>
+<label for="island-demo-slider-ramp">Ramp <input id="island-demo-slider-ramp" type="range" min="0" max="100" value="0"> </label>
+<label for="island-demo-show">Show 
+	<select id="island-demo-show">
+		<option value="base">Generate</option> 
+		<option value="shaped">Filter</option> 
+		<option value="colored">Interpret: 2D</option> 
+		<option value="island">Interpret: 3D</option> 
+	</select>
+</label>
+"""
 
 # start the demo
-island_demo $('#island-demo')
+island_demo $('#island-demo, #lab-demo')

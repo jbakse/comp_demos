@@ -129,6 +129,20 @@ morie_demo = (element)->
 		#morie-demo-slider-zoom,
 		#morie-demo-menu-material').change update
 
+
+
+# inject the controls
+$('#morie-demo-controls, #lab-demo-controls').html """
+<label for="morie-demo-slider-a">A <input id="morie-demo-slider-a" type="range" min="0" max="100" value="85"></label>
+<label for="morie-demo-slider-zoom">Zoom <input id="morie-demo-slider-zoom" type="range" min="50" max="500" value="500"></label>
+<label for="morie-demo-menu-material">Material 
+	<select id="morie-demo-menu-material">
+		<option value="black">black</option> 
+		<option value="color">color</option> 
+		<option value="blur">blur</option> 
+	</select>
+</label>
+"""
 	
 # kick off the demo
-morie_demo $('#morie-demo')
+morie_demo $('#morie-demo, #lab-demo')

@@ -42,5 +42,11 @@ setup_demo = (element)->
 
 	$('#setup-demo-button-animate').one "click", animate
 
+
+# inject controls
+$('#setup-demo-controls, #lab-demo-controls').html """
+<button id="setup-demo-button-animate">Animate</button>
+"""
+
 # kick off the demo
-setup_demo $('#setup-demo')
+setup_demo $('#setup-demo, #lab-demo')

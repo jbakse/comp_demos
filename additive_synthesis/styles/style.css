@@ -13,6 +13,11 @@ h1 {
 
 h2 {
 	font-size: 2em;
+	margin-top: 3em;
+}
+
+h3 {
+	margin: 1.5em 0 -.5em 0;
 }
 
 a 
@@ -41,17 +46,13 @@ ul
 }
 
 
-section {
-	margin-bottom: 6em;
-}
 
 
 main {
 	max-width: 788px;
 	margin: 0 auto;
+	padding-bottom: 2em;
 }
-
-
 
 
 
@@ -103,8 +104,22 @@ main {
 	vertical-align: top;
 }
 
+.demo-controls label>span
+{
+	display: table; width: 100%;
+}
+
+.demo-controls label>span .prefix
+{
+	display: table-cell; 
+	width: 30px;
+	font-family: Monaco;
+	font-size: 12px;
+}
+
 .demo-controls label.full
 {
+	
 	width: 100%;
 }
 
