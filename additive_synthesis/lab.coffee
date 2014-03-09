@@ -16,15 +16,30 @@ editor.setShowInvisiblesfalse
 editor.setShowPrintMargin false
 
 
+reinject = (editor)->
+	$('iframe').attr "src", ""
+	debounce 0, ()->inject()
+
+editor.commands.addCommand
+    name: "Reload iFrame",
+    bindKey: {win: "Ctrl-B|Ctrl-R|Ctrl-S", mac: "Command-B|Command-R|Command-S"},
+    exec: reinject
+        
+ 
+
+
 script_name = window.location.search.substr(1)
 
 $.get script_name, (source)->
 	editor.setValue(source)
 	editor.gotoLine(1);
 	inject()
-	editor.getSession().on 'change', (e)->
-		$('iframe').attr "src", ""
-		debounce 500, ()->inject()
+
+	$('#run').click reinject
+		
+	# editor.getSession().on 'change', (e)->
+	# 	$('iframe').attr "src", ""
+	# 	debounce 500, ()->inject()
 
 
 inject = ()->

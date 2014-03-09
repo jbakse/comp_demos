@@ -8,7 +8,7 @@
 	<style>
 		body {
 			margin: 0;
-			background-color: black;
+			background-color: #333;
 			color: white;
 		}
 		iframe
@@ -20,15 +20,27 @@
 			transition: height .5s;
 		}
 		#editor {
-			border-top: 10px solid black;
+			/*border-top: 10px solid black;*/
 			height: 10000px;
 			font-size: 16px;
+		}
+		#lab-controls{
+			background-color: black;
+			padding: 10px 0 10px 10px;
+			vertical-align: middle;
+			color: #777;
+			font-family: Monaco;
+			font-size: 12px;
+
 		}
 	</style>
 </head>
 
 <body>
 	<iframe></iframe>
+	<div id="lab-controls">
+		<button id="run">Run</button> Command-B
+	</div>
 	<div id="editor"></div>
 </body>
 
