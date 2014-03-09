@@ -426,7 +426,26 @@ island_demo = (element)->
 
 
 	
-
+# inject controls
+$('#island-demo-controls, #lab-demo-controls').html """
+<label for="island-demo-slider-a">A <input id="island-demo-slider-a" type="range" min="2" max="100" value="20"> </label>
+<label for="island-demo-slider-vignette">Vignette <input id="island-demo-slider-vignette" type="range" min="0" max="100" value="0"> </label>
+<label for="island-demo-slider-preamp">Pre-Gain <input id="island-demo-slider-preamp" type="range" min="0" max="200" value="100"></a></label>
+<label for="island-demo-slider-bias">Bias <input id="island-demo-slider-bias" type="range" min="-100" max="100" value="0"></a></label>
+<label for="island-demo-slider-exponent">Exponent <input id="island-demo-slider-exponent" type="range" min="0" max="500" value="100"></a></label>
+<label for="island-demo-slider-min">Min <input id="island-demo-slider-min" type="range" min="0" max="100" value="0"></a></label>
+<label for="island-demo-slider-max">Max <input id="island-demo-slider-max" type="range" min="0" max="100" value="100"></a></label>
+<label for="island-demo-slider-postamp">Post-Gain <input id="island-demo-slider-postamp" type="range" min="0" max="200" value="100"></a></label>
+<label for="island-demo-slider-ramp">Ramp <input id="island-demo-slider-ramp" type="range" min="0" max="100" value="0"> </label>
+<label for="island-demo-show">Show 
+	<select id="island-demo-show">
+		<option value="base">Generate</option> 
+		<option value="shaped">Filter</option> 
+		<option value="colored">Interpret: 2D</option> 
+		<option value="island">Interpret: 3D</option> 
+	</select>
+</label>
+"""
 
 # start the demo
-island_demo $('#island-demo')
+island_demo $('#island-demo, #lab-demo')

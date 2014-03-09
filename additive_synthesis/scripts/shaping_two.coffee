@@ -114,5 +114,15 @@ shaping_two_demo = (element)->
 	$('#shaping-two-demo-generator, #shaping-two-demo-filter').keyup drawWaves
 
 
+# inject the controls
+$('#shaping-two-demo-controls, #lab-demo-controls').html """
+<label class="full" for="shaping-two-demo-generator">Generator 
+	<span><span class="prefix">y =</span><input id="shaping-two-demo-generator" type="text" value="Math.sin(x/20)"></input></span>
+</label>
+<label class="full" for="shaping-two-demo-filter">Filter 
+	<span><span class="prefix">y =</span><input id="shaping-two-demo-filter" type="text" value="y * .5 + .5"></input></span>
+</label>
+"""
+
 # kick off the demo
-shaping_two_demo $('#shaping-two-demo')
+shaping_two_demo $('#shaping-two-demo, #lab-demo')

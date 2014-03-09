@@ -64,10 +64,17 @@ additive_demo = (element)->
 
 		c.restore()
 
-	#draw the waves once now, and again when the sliders' values change
+	# draw the waves once now, and again when the sliders' values change
 	drawWaves()
 	$('#additive-demo-slider-a, #additive-demo-slider-b, #additive-demo-slider-c').change drawWaves
 
 
+# inject the controls
+$('#additive-demo-controls, #lab-demo-controls').html """
+<label for="additive-demo-slider-a">A <input id="additive-demo-slider-a" type="range" min="2" max="100" value="20"></input></label>
+<label for="additive-demo-slider-b">B <input id="additive-demo-slider-b" type="range" min="2" max="100" value="27"></input></label>
+<label for="additive-demo-slider-c">C <input id="additive-demo-slider-c" type="range" min="2" max="100" value="51"></input></label>
+"""
+
 # kick off the demo
-additive_demo $('#additive-demo')
+additive_demo $('#additive-demo, #lab-demo')

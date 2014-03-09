@@ -39,28 +39,18 @@ Audio syntheizers often use [Addative Synthesis](http://en.wikipedia.org/wiki/Ad
 This basic concept—adding simple patterns together to make complex patterns—can used in many ways. The demo below shows three sine waves of different periods and amplitudes in gray and their sum in red. Notice that though the sine waves repeat frequently, the period of the sum wave is much longer. The sum wave does eventually repeat; its period will be the least common multiple of the periods of the sine waves.
 
 <div id="additive-demo" class="demo"><img src="images/2x1.png" /></div>
-<div class = "demo-controls">
-	<label for="additive-demo-slider-a">A <input id="additive-demo-slider-a" type="range" min="2" max="100" value="20"></input></label>
-	<label for="additive-demo-slider-b">B <input id="additive-demo-slider-b" type="range" min="2" max="100" value="27"></input></label>
-	<label for="additive-demo-slider-c">C <input id="additive-demo-slider-c" type="range" min="2" max="100" value="51"></input></label>
-</div>
+<div id="additive-demo-controls" class="demo-controls"></div>
 <div><script type="text/coffeescript" src="scripts/additive.coffee"></script></div>
+<div><a class="view-code" href="lab.html?scripts/additive.coffee">View Code</a></div>
 
 ##Shaping: Bend The Numbers to Your Will
 
 We have seen that complex patterns of numbers can be created by adding simple patterns together. Sometimes it is helpful to post-process the resulting values to achieve specific effects. The demo below shows three sequences of numbers: a sine wave, a saw wave, and the sum of sines from the first demo. By mathematically manipulating each number in the sequences we can shape them.
 
 <div id="shaping-demo" class="demo"><img src="images/2x1.png" /></div>
-<div class = "demo-controls">
-	<label for="shaping-demo-slider-preamp">Pre-Gain <input id="shaping-demo-slider-preamp" type="range" min="0" max="200" value="100"></input></label>
-	<label for="shaping-demo-slider-bias">Bias <input id="shaping-demo-slider-bias" type="range" min="-100" max="100" value="0"></input></label>
-	<label for="shaping-demo-slider-exponent">Exponent <input id="shaping-demo-slider-exponent" type="range" min="0" max="500" value="100"></input></label>
-	<label for="shaping-demo-slider-min">Min <input id="shaping-demo-slider-min" type="range" min="-100" max="100" value="-100"></input></label>
-	<label for="shaping-demo-slider-max">Max <input id="shaping-demo-slider-max" type="range" min="-100" max="100" value="100"></input></label>
-	<label for="shaping-demo-slider-postamp">Post-Gain <input id="shaping-demo-slider-postamp" type="range" min="0" max="200" value="100"></input></label>
-	<label for="shaping-demo-slider-abs">Absolute Value <input id="shaping-demo-slider-abs" type="checkbox"></input></label>
-</div>
+<div id="shaping-demo-controls" class="demo-controls"></div>
 <div><script type="text/coffeescript" src="scripts/shaping.coffee"></script></div>
+<div><a class="view-code" href="lab.html?scripts/shaping.coffee">View Code</a></div>
 
 - **Pre-Gain** multiplies each number by a constant factor.
 - **Bais** adds a set amount to the values.
@@ -74,16 +64,9 @@ We have seen that complex patterns of numbers can be created by adding simple pa
 The next demo allows you to directly enter a mathematical expression to generate a series of numbers and process them:
 
 <div id="shaping-two-demo" class="demo"><img src="images/2x1.png" /></div>
-<div class = "demo-controls">
-	<label class="full" for="shaping-two-demo-generator">Generator 
-		<span><span class="prefix">y =</span><input id="shaping-two-demo-generator" type="text" value="Math.sin(x/20)"></input></span>
-	</label>
-	<label class="full" for="shaping-two-demo-filter">Filter 
-		<span><span class="prefix">y =</span><input id="shaping-two-demo-filter" type="text" value="y * .5 + .5"></input></span>
-	</label>
-</div>
+<div id="shaping-two-demo-controls" class="demo-controls"></div>
 <div><script type="text/coffeescript" src="scripts/shaping_two.coffee"></script></div>
-
+<div><a class="view-code" href="lab.html?scripts/shaping_two.coffee">View Code</a></div>
 
 ##On an Empty Field a Single Blue Dot: Introducing Three JS
 
@@ -94,11 +77,9 @@ Three.js is a library that makes working with WebGL easier, by packaging up some
 The Demo below shows how to setup, render, and animate a basic scene.
 
 <div id="setup-demo" class="demo"><img src="images/2x1.png" /></div>
-<div class = "demo-controls">
-	<button id="setup-demo-button-animate">Animate</button>
-</div>
+<div id="setup-demo-controls" class="demo-controls"></div>
 <div><script type="text/coffeescript" src="scripts/setup_threejs.coffee"></script></div>
-
+<div><a class="view-code" href="lab.html?scripts/setup_threejs.coffee">View Code</a></div>
 
 ##Morié Patterns: Emergence in Two-dimensional Patterns
 
@@ -107,18 +88,9 @@ Combining simple patterns to create complex ones works with two-dimensional patt
 The demo above draws two patterns of dots. When zoomed out you can see the Morie Patterns clearly. Up close, the underlying patterns can become lost.
 
 <div id="morie-demo" class="demo"><img src="images/2x1.png" /></div>
-<div class = "demo-controls">
-	<label for="morie-demo-slider-a">A <input id="morie-demo-slider-a" type="range" min="0" max="100" value="85"></label>
-	<label for="morie-demo-slider-zoom">Zoom <input id="morie-demo-slider-zoom" type="range" min="50" max="500" value="500"></label>
-	<label for="morie-demo-menu-material">Material 
-		<select id="morie-demo-menu-material">
-			<option value="black">black</option> 
-			<option value="color">color</option> 
-			<option value="blur">blur</option> 
-		</select>
-	</label>
-</div>
+<div id="morie-demo-controls" class="demo-controls"></div>
 <div><script type="text/coffeescript" src="scripts/morie.coffee"></script></div>
+<div><a class="view-code" href="lab.html?scripts/morie.coffee">View Code</a></div>
 
 - **A** adjusts the rotation and scale of one of the layers.
 - **Zoom** will scale the overall scene.
@@ -142,27 +114,14 @@ The program then filters the image by applying a function to the color values of
 The program then interprets the gray scale values of the image. Instead of considering the values as the Red, Green, and Blue values to display, the program uses the brightness to look up a color in table. This works like a color-by-number. The 3D view also uses the brightness of the pixel. This time it determines the height of the island at each point.
 
 <div id="island-demo" class="demo"><img src="images/2x1.png" /></div>
-<div class = "demo-controls">
-	<label for="island-demo-slider-a">A <input id="island-demo-slider-a" type="range" min="2" max="100" value="20"> </label>
-	<label for="island-demo-slider-vignette">Vignette <input id="island-demo-slider-vignette" type="range" min="0" max="100" value="0"> </label>
-	
-	<label for="island-demo-slider-preamp">Pre-Gain <input id="island-demo-slider-preamp" type="range" min="0" max="200" value="100"></a></label>
-	<label for="island-demo-slider-bias">Bias <input id="island-demo-slider-bias" type="range" min="-100" max="100" value="0"></a></label>
-	<label for="island-demo-slider-exponent">Exponent <input id="island-demo-slider-exponent" type="range" min="0" max="500" value="100"></a></label>
-	<label for="island-demo-slider-min">Min <input id="island-demo-slider-min" type="range" min="0" max="100" value="0"></a></label>
-	<label for="island-demo-slider-max">Max <input id="island-demo-slider-max" type="range" min="0" max="100" value="100"></a></label>
-	<label for="island-demo-slider-postamp">Post-Gain <input id="island-demo-slider-postamp" type="range" min="0" max="200" value="100"></a></label>
-	<label for="island-demo-slider-ramp">Ramp <input id="island-demo-slider-ramp" type="range" min="0" max="100" value="0"> </label>
-	<label for="island-demo-show">Show 
-		<select id="island-demo-show">
-			<option value="base">Generate</option> 
-			<option value="shaped">Filter</option> 
-			<option value="colored">Interpret: 2D</option> 
-			<option value="island">Interpret: 3D</option> 
-		</select>
-	</label>
-</div>
+<div id="island-demo-controls" class="demo-controls"></div>
 <div><script type="text/coffeescript" src="scripts/islands.coffee"></script></div>
+<div><a class="view-code" href="lab.html?scripts/islands.coffee">View Code</a></div>
+
+
+
+
+
 
 
 
