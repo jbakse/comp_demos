@@ -98,7 +98,26 @@ The demo above draws two patterns of dots. When zoomed out you can see the Morie
 
 The first demos created a set of numbers using a purely mathematical approach. This demo constructs an image by drawing circles following a specific procedure. The image can be considered as a set of numbers. Each pixel in the image is represented by three numbers ranging from 0 to 255. These numbers are interpreted as the red level, green level, and blue level when the image is drawn. We could interpret these numbers differently though. In the next demo we will do just that.
 
+##Color Ramps and Palette Swaps 
 
+Grayscale images can be colorized by assigning a specific color to each grayscale shade. This technique was common on 8 and 16 bit video game systems where resources were tight. Saving a single grayscale value for each pixel takes less memory than storing values for red, green, and blue. Even more dramatic savings were found by using different palettes to colorize the same sprites, creating variety.
+
+<img src="images/megamanlarge.png" style="width: 100%; height: auto;" />
+
+<img src="images/gray_scale_ramp.png" style="width: 100%; height: auto;" />
+
+<img src="images/gray_scale_ramp_16.png" style="width: 100%; height: auto;" />
+
+<img src="images/megaman_ramp.png" style="width: 100%; height: auto;" />
+
+<img src="images/color_ramp.png" style="width: 100%; height: auto;" />
+
+- [Color Ramp Builder](http://www.pixelfor.me/crc/)
+
+In the very early days of video games, the processor was not powerful enough to update a whole rastor-based screen for every frame of animation. Care had to be taken to make sure that only the pixels that changed between frames were touched. Full screen animation was impossible, almost. A technique called color cycling, or palette rotation, allowed for animation effects without actually changing the stored values in the rastor data _at all_. Instead, the pallete used to color the data—much less data—was changed frame to frame.
+
+
+- [Palette Rotation/Color Cycling Example](http://www.effectgames.com/demos/canvascycle/)
 
 ##And The Islands Rise
 
